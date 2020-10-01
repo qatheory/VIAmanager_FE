@@ -1,5 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
+import { store } from "./store";
+
 import { fade, makeStyles, useTheme } from '@material-ui/core/styles';
 import './App.css';
 import {
