@@ -1,7 +1,7 @@
 import React, { Component } from "react"
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
-import Home from "../../pages/Home"
-import Edit from "../../pages/Edit"
+import { Route } from "react-router-dom"
+import Home from "pages/Home"
+import Edit from "pages/Edit"
 class RouterURL extends Component {
     render() {
         return (

@@ -1,7 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
-import { store } from "./store";
-
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  toggleDrawer,
+  selectDrawerStatus
+} from 'store/reducers/viewSettings'
 import { fade, makeStyles, useTheme } from '@material-ui/core/styles';
 import './App.css';
 import {
@@ -124,28 +127,8 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRight: theme.spacing(2),
   },
-  userNameText: {
-    "font-size": "24px",
-    "font-weight": 600,
-    color: "rgba(0,0,0,0.55)",
-  },
   hide: {
     display: 'none',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(2, 2),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    // justifyContent: 'flex-end',
   },
   floatRight: {
     "margin-left": "auto"
@@ -168,58 +151,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-let navigatePath = {
-  main:
-    [
-      {
-        text: "Thống kê",
-        path: "overview",
-        icon: "InsertChartIcon"
-      },
-      {
-        text: "Quản lý",
-        path: "manage",
-        icon: "BuildIcon"
-      },
-      {
-        text: "Người dùng",
-        path: "users",
-        icon: "PeopleIcon"
-
-      }]
-  ,
-  personal:
-    [
-      {
-        text: "Hồ sơ",
-        path: "user",
-        icon: "AccountCircleIcon"
-      }
-    ]
-}
-
-function getIcon(icon) {
-  switch (icon) {
-    case 'InsertChartIcon':
-      return (<InsertChartIcon />);
-    case 'BuildIcon':
-      return (<BuildIcon />);
-    case 'PeopleIcon':
-      return (<PeopleIcon />);
-    case "AccountCircleIcon":
-      return (<AccountCircleIcon />);
-    default:
-      return (<SentimentVeryDissatisfiedIcon />)
-  }
-}
-
 function App() {
   const classes = useStyles();
   const theme = useTheme();
-  const open = true
-  // const [open, setOpen] = React.useState(false);
+  const drawerStatus = useSelector(selectDrawerStatus)
+  const dispatch = useDispatch()
   const handleDrawer = () => {
-    // setOpen(!open);
+    dispatch(toggleDrawer())
   };
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -308,7 +246,7 @@ function App() {
         <AppBar
           position="fixed"
           className={clsx(classes.appBar, {
-            [classes.appBarShift]: open,
+            [classes.appBarShift]: drawerStatus,
           })}
         >
           <Toolbar>
@@ -319,7 +257,7 @@ function App() {
               edge="start"
               className={clsx(classes.menuButton)}
             >
-              {open ? <ChevronLeftIcon /> : <MenuIcon />}
+              {drawerStatus ? <ChevronLeftIcon /> : <MenuIcon />}
             </IconButton>
             <Typography className={clsx(classes.title_bold, classes.title)} noWrap>
               {`VIA`}
@@ -416,7 +354,7 @@ function App() {
         </Drawer> */}
         <main
           className={clsx(classes.content, {
-            [classes.contentShift]: open,
+            [classes.contentShift]: drawerStatus,
           })}
         >
           <div className={classes.drawerHeader} />

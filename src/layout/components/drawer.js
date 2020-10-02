@@ -8,6 +8,11 @@ import {
     ListItem,
     ListItemText,
 } from '@material-ui/core';
+import { useSelector, useDispatch } from 'react-redux'
+import {
+    toggleDrawer,
+    selectDrawerStatus
+} from 'store/reducers/viewSettings'
 import InsertChartIcon from '@material-ui/icons/InsertChart';
 import SentimentVeryDissatisfiedIcon from '@material-ui/icons/SentimentVeryDissatisfied';
 import PeopleIcon from '@material-ui/icons/People';
@@ -86,8 +91,9 @@ function getIcon(icon) {
 }
 
 // const [open, setOpen] = React.useState(false);
-const open = true
+
 function MyDrawer() {
+    const drawerStatus = useSelector(selectDrawerStatus)
     const classes = useStyles();
     return (
 
@@ -95,7 +101,7 @@ function MyDrawer() {
             className={classes.drawer}
             variant="persistent"
             anchor="left"
-            open={open}
+            open={drawerStatus}
             classes={{
                 paper: classes.drawerPaper,
             }}
