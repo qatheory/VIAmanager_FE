@@ -1,6 +1,6 @@
 import React from 'react';
-import clsx from 'clsx';
-import { fade, makeStyles, useTheme } from '@material-ui/core/styles';
+// import clsx from 'clsx';
+import { makeStyles } from '@material-ui/core/styles';
 import {
     Drawer,
     Divider,
@@ -9,8 +9,10 @@ import {
     ListItemText,
 } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux'
+import { ClickAwayListener } from '@material-ui/core';
+
 import {
-    toggleDrawer,
+    closeDrawer,
     selectDrawerStatus
 } from 'store/reducers/viewSettings'
 import InsertChartIcon from '@material-ui/icons/InsertChart';
@@ -19,7 +21,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import BuildIcon from '@material-ui/icons/Build';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 const drawerWidth = 300;
 const useStyles = makeStyles((theme) => ({
 
@@ -92,15 +94,24 @@ function getIcon(icon) {
 
 // const [open, setOpen] = React.useState(false);
 
-function MyDrawer() {
+function DrawerCustom() {
     const drawerStatus = useSelector(selectDrawerStatus)
     const classes = useStyles();
-    return (
+    const dispatch = useDispatch()
+    const handleDrawerClose = () => {
+        if (drawerStatus === true) {
+            dispatch(closeDrawer())
+        }
 
+    }
+    return (
+        // <ClickAwayListener onClickAway={handleClickAway}>
         <Drawer
             className={classes.drawer}
-            variant="persistent"
+            variant="temporary"
             anchor="left"
+            onEscapeKeyDown={handleDrawerClose}
+            onBackdropClick={handleDrawerClose}
             open={drawerStatus}
             classes={{
                 paper: classes.drawerPaper,
@@ -132,7 +143,8 @@ function MyDrawer() {
                 ))}
             </List>
         </Drawer>
+        // </ClickAwayListener>
     );
 }
 
-export default MyDrawer;
+export default DrawerCustom;
