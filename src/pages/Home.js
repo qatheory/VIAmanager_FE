@@ -1,26 +1,32 @@
-import React from 'react';
+import React from "react";
 import {
-    Typography,
-} from '@material-ui/core';
+  Typography,
+  CssBaseline,
+  AppBar,
+  Toolbar,
+  Container,
+  Box,
+} from "@material-ui/core";
 function Home(props) {
-    return (
-        <div>
-            <Typography paragraph>
-                this is HOME
-        </Typography>
-            <Typography paragraph>
-                Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-                facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-                tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-                consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-                vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-                hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-                tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-                nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-                accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
-        </div>
-    );
+  return (
+    <React.Fragment>
+      <Toolbar>
+        <Typography variant="h6">Scroll to Elevate App Bar</Typography>
+      </Toolbar>
+      <Container>
+        <Box my={2}>
+          {[...new Array(12)]
+            .map(
+              () => `Cras mattis consectetur purus sit amet fermentum.
+Cras justo odio, dapibus ac facilisis in, egestas eget quam.
+Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+Praesent commodo cursus magna, vel scelerisque nisl consectetur et.`
+            )
+            .join("\n")}
+        </Box>
+      </Container>
+    </React.Fragment>
+  );
 }
 
 export default Home;

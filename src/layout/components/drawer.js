@@ -52,31 +52,35 @@ let navigatePath = {
   main: [
     {
       text: "Thống kê",
-      path: "overview",
+      path: "/admin/overview",
       icon: "InsertChartIcon",
     },
     {
       text: "Quản lý",
-      path: "manage",
       icon: "BuildIcon",
       childPath: [
         {
-          text: "VIA",
-          path: "create-via",
+          text: "VIA Facebook",
+          path: "/admin/manage-via",
+          icon: "BuildIcon",
+        },
+        {
+          text: "Bussiness",
+          path: "/admin/manage-bm",
           icon: "BuildIcon",
         },
       ],
     },
     {
       text: "Người dùng",
-      path: "users",
+      path: "/admin/users",
       icon: "PeopleIcon",
     },
   ],
   personal: [
     {
       text: "Hồ sơ",
-      path: "user",
+      path: "/admin/user",
       icon: "AccountCircleIcon",
     },
   ],
@@ -176,7 +180,7 @@ function DrawerCustom() {
                       return (
                         <ListItem
                           component={Link}
-                          to={`/${child.path}`}
+                          to={`${child.path}`}
                           button
                           key={childIndex}
                           className={classes.nested}
@@ -192,7 +196,7 @@ function DrawerCustom() {
             );
           }
           return (
-            <ListItem component={Link} to={`/${path.path}`} button key={index}>
+            <ListItem component={Link} to={`${path.path}`} button key={index}>
               <ListItemIcon>{getIcon(path.icon)}</ListItemIcon>
               <ListItemText>{path.text} </ListItemText>
             </ListItem>
@@ -202,7 +206,7 @@ function DrawerCustom() {
       <Divider />
       <List>
         {navigatePath.personal.map((path, index) => (
-          <ListItem component={Link} to={`/${path.path}`} button key={index}>
+          <ListItem component={Link} to={`${path.path}`} button key={index}>
             <ListItemIcon>{getIcon(path.icon)}</ListItemIcon>
             <ListItemText primary={path.text} />
           </ListItem>
