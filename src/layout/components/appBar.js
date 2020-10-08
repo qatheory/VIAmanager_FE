@@ -19,7 +19,11 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/More";
 import MailIcon from "@material-ui/icons/Mail";
 import MenuIcon from "@material-ui/icons/Menu";
+import { totp } from 'otplib';
+var authenticator = require('authenticator');
+var formattedToken = authenticator.generateToken("B6M3BHYDKKP3DFVLDMRZ6OZITXRL3H5T");
 const drawerWidth = 300;
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
