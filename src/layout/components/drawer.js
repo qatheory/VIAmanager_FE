@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 
-import { closeDrawer, selectDrawerStatus } from "store/reducers/viewSettings";
+import { closeDrawer, selectDrawerStatus, setLoggedOut } from "store/reducers/viewSettings";
 import InsertChartIcon from "@material-ui/icons/InsertChart";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
 import PeopleIcon from "@material-ui/icons/People";
@@ -20,6 +20,7 @@ import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { Link } from "react-router-dom";
 const drawerWidth = 300;
 const useStyles = makeStyles((theme) => ({
@@ -82,7 +83,7 @@ let navigatePath = {
       text: "Hồ sơ",
       path: "/admin/user",
       icon: "AccountCircleIcon",
-    },
+    }
   ],
 };
 
@@ -127,6 +128,10 @@ function DrawerCustom() {
       dispatch(closeDrawer());
     }
   };
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    dispatch(setLoggedOut())
+  }
   return (
     <Drawer
       className={classes.drawer}
@@ -167,8 +172,8 @@ function DrawerCustom() {
                   {manageChildPath.get(path.path) ? (
                     <ExpandLess />
                   ) : (
-                    <ExpandMore />
-                  )}
+                      <ExpandMore />
+                    )}
                 </ListItem>
                 <Collapse
                   in={manageChildPath.get(path.path)}
@@ -211,6 +216,10 @@ function DrawerCustom() {
             <ListItemText primary={path.text} />
           </ListItem>
         ))}
+        <ListItem button onClick={() => handleLogout()} key={"logout"}>
+          <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+          <ListItemText primary="Đăng xuất" />
+        </ListItem>
       </List>
     </Drawer>
   );

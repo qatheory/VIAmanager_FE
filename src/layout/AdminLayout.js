@@ -152,7 +152,6 @@ function AdminLayout(props) {
       </MenuItem>
     </Menu>
   );
-  console.log(props.location.pathname);
   return (
     <div className={classes.root}>
       <ThemeProvider theme={theme}>
