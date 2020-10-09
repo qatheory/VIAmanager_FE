@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 
-import { closeDrawer, selectDrawerStatus, setLoggedOut } from "store/reducers/viewSettings";
+import { closeDrawer, selectDrawerStatus, setLoggedOut, selectUsername } from "store/reducers/viewSettings";
 import InsertChartIcon from "@material-ui/icons/InsertChart";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
 import PeopleIcon from "@material-ui/icons/People";
@@ -116,7 +116,8 @@ class DrawerState {
 // const [open, setOpen] = React.useState(false);
 
 function DrawerCustom() {
-  const drawerStatus = useSelector(selectDrawerStatus);
+  let drawerStatus = useSelector(selectDrawerStatus);
+  let username = useSelector(selectUsername);
   const classes = useStyles();
   let [manageChildPath, setManageChildPath] = React.useState(new DrawerState());
   const dispatch = useDispatch();
@@ -130,6 +131,7 @@ function DrawerCustom() {
   };
   const handleLogout = () => {
     localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     dispatch(setLoggedOut())
   }
   return (
@@ -146,7 +148,7 @@ function DrawerCustom() {
     >
       <div className={classes.drawerHeader}>
         <div>
-          <div className={classes.userNameText}>Admin</div>
+          <div className={classes.userNameText}>{username}</div>
           <div>admin@admin.com</div>
         </div>
       </div>

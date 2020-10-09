@@ -3,37 +3,58 @@ import AdminLayout from "layout/AdminLayout.js";
 import SignIn from "pages/auth/SignIn"
 import SignUp from "pages/auth/SignUp"
 import { useSelector, useDispatch } from "react-redux";
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import { selectLoggedIn, setUsername } from "store/reducers/viewSettings";
-function App() {
-  const dispatch = useDispatch();
-  const loggenIn = useSelector(selectLoggedIn);
+import { BrowserRouter as Router, Route, Switch, Redirect, withRouter } from "react-router-dom";
+import { selectLoggedIn, setUsername, setLoggedOut } from "store/reducers/viewSettings";
+import axios from 'axios';
+import Constants from "_helpers/constants.js"
+import Commons from "_helpers/commons.js"
 
+function PrivateRoute({ component: Component, authed, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={(props) => authed === true
+        ? <Component {...props} />
+        : <Redirect to={{ pathname: '/login' }} />}
+    />
+  )
+}
+
+function App(props) {
+  const dispatch = useDispatch();
+  const loggedIn = useSelector(selectLoggedIn);
   React.useEffect(() => {
-    if (loggenIn) {
-      fetch('http://127.0.0.1:8000/api/current_user/', {
+    if (loggedIn) {
+      axios({
+        url: `${Constants.API_DOMAIN}api/current_user/`,
         method: 'GET',
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('token')}`
-        }
+        headers: Commons.header()
       })
-        .then(res => res.json())
         .then(resp => {
-          dispatch(setUsername(resp.username))
+          dispatch(setUsername(resp.data.username))
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          props.history.push('/signin');
+          dispatch(setLoggedOut())
+        });
+
     }
   });
+  const handleRedirection = () => {
+    if (loggedIn) {
+      return (<Redirect to="/admin/manage-via" />)
+    }
+    return (<Redirect to="/signin" />)
+  }
   return (
-    <Router>
-      <Switch>
-        <Route component={AdminLayout} path="/admin"></Route>
-        <Route component={SignIn} path="/signin"></Route>
-        <Route component={SignUp} path="/signup"></Route>
-        <Redirect to="/admin/manage-via" />
-      </Switch>
-    </Router>
+
+    <Switch>
+      <PrivateRoute authed={loggedIn} path='/admin' component={AdminLayout} />
+      <Route component={SignIn} path="/signin"></Route>
+      <Route component={SignUp} path="/signup"></Route>
+      {handleRedirection()}
+    </Switch>
   );
 }
 
-export default App;
+export default withRouter(App);

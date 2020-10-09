@@ -4,7 +4,7 @@ export const viewSettingsSlice = createSlice({
     name: 'viewSettings',
     initialState: {
         drawerStatus: false,
-        loggedIn: localStorage.getItem('token') ? true : false,
+        loggedIn: (localStorage.getItem('token') || sessionStorage.getItem('token')) ? true : false,
         username: null
     },
     reducers: {

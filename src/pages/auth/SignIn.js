@@ -13,8 +13,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-
-
+import { setLoggedIn, setUsername } from "store/reducers/viewSettings";
+import { useSelector, useDispatch } from "react-redux";
+import axios from 'axios';
+import Constants from "_helpers/constants.js"
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
@@ -35,10 +37,45 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SignIn() {
+export default function SignIn(props) {
     const classes = useStyles();
+    const dispatch = useDispatch()
+    let [formUsername, setFormUsername] = React.useState("")
+    let [formPassword, setFormPassword] = React.useState("")
+    let [remember, setRemember] = React.useState(false)
+    const handleChangeUsername = (event) => {
+        setFormUsername(event.target.value)
+    }
+    const handleChangePassword = (event) => {
+        setFormPassword(event.target.value)
+    }
+    const handleChangeRemember = (event) => {
+        setRemember(event.target.value)
+    }
     const handleLogin = (event) => {
         event.preventDefault();
+
+        let url = `${Constants.API_DOMAIN}token-auth/`
+        console.log(url)
+        let userInfo = { username: formUsername, password: formPassword }
+        axios({
+            url: `${Constants.API_DOMAIN}token-auth/`,
+            method: 'POST',
+            data: userInfo
+        })
+            .then(res => {
+                if (res.data.token) {
+                    if (remember) {
+                        localStorage.setItem('token', res.data.token)
+                    } else {
+                        sessionStorage.setItem('token', res.data.token)
+                    }
+
+                    dispatch(setLoggedIn())
+                    dispatch(setUsername(res.data.user.username))
+                    props.history.push('/admin/manage-via');
+                }
+            })
     }
     return (
         <Container component="main" maxWidth="xs">
@@ -60,6 +97,7 @@ export default function SignIn() {
                         label="Tài khoản"
                         name="username"
                         autoComplete="username"
+                        value={formUsername} onChange={handleChangeUsername}
                         autoFocus
                     />
                     <TextField
@@ -71,6 +109,7 @@ export default function SignIn() {
                         label="Mật khẩu"
                         type="password"
                         id="password"
+                        value={formPassword} onChange={handleChangePassword}
                         autoComplete="current-password"
                     />
                     <FormControlLabel
@@ -82,6 +121,7 @@ export default function SignIn() {
                         fullWidth
                         variant="contained"
                         color="primary"
+                        value={remember} onChange={handleChangeRemember}
                         className={classes.submit}
                     >
                         Đăng nhập
