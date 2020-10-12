@@ -20,8 +20,6 @@ import MoreIcon from "@material-ui/icons/More";
 import MailIcon from "@material-ui/icons/Mail";
 import MenuIcon from "@material-ui/icons/Menu";
 import { totp } from 'otplib';
-var authenticator = require('authenticator');
-var formattedToken = authenticator.generateToken("B6M3BHYDKKP3DFVLDMRZ6OZITXRL3H5T");
 const drawerWidth = 300;
 
 
@@ -34,10 +32,10 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   title: {
-    display: "none",
-    [theme.breakpoints.up("sm")]: {
+    // display: "none",
+    // [theme.breakpoints.up("sm")]: {
       display: "block",
-    },
+    // },
   },
   title_thin: {
     "font-weight": "lighter",
@@ -182,7 +180,7 @@ function AppBarCustom(props) {
         >
           MANAGER
         </Typography>
-        <div className={classes.search}>
+        {/* <div className={classes.search}>
           <div className={classes.searchIcon}>
             <SearchIcon />
           </div>
@@ -194,7 +192,7 @@ function AppBarCustom(props) {
             }}
             inputProps={{ "aria-label": "search" }}
           />
-        </div>
+        </div> */}
         <div className={classes.grow} />
         <div className={classes.sectionDesktop}>
           <IconButton aria-label="show 4 new mails" color="inherit">

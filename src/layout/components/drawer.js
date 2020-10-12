@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 // import clsx from 'clsx';
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -8,10 +8,16 @@ import {
   ListItem,
   ListItemText,
   Collapse,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 
 import { closeDrawer, selectDrawerStatus, setLoggedOut, selectUsername } from "store/reducers/viewSettings";
+import { selectCurrentWorkspace,selectListWorkspaces,setCurrentWorkspace } from "store/reducers/workspaceSettings";
+
 import InsertChartIcon from "@material-ui/icons/InsertChart";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
 import PeopleIcon from "@material-ui/icons/People";
@@ -29,7 +35,9 @@ const useStyles = makeStyles((theme) => ({
     "font-weight": 600,
     color: "rgba(0,0,0,0.55)",
   },
-
+  workspaceSelect:{
+    width: "100%"
+  },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -73,7 +81,7 @@ let navigatePath = {
       ],
     },
     {
-      text: "Người dùng",
+      text: "Nhóm",
       path: "/admin/users",
       icon: "PeopleIcon",
     },
@@ -118,6 +126,9 @@ class DrawerState {
 function DrawerCustom() {
   let drawerStatus = useSelector(selectDrawerStatus);
   let username = useSelector(selectUsername);
+  let currentWorkspace = useSelector(state => state.workspaces.currentWorkspace)
+  let listWorkspaces = useSelector(state => state.workspaces.listWorkspaces)
+  
   const classes = useStyles();
   let [manageChildPath, setManageChildPath] = React.useState(new DrawerState());
   const dispatch = useDispatch();
@@ -155,6 +166,24 @@ function DrawerCustom() {
       <Divider />
 
       <List>
+        <ListItem
+          button
+          key="workspace"
+        >
+          <FormControl variant="outlined" className={classes.workspaceSelect}>
+            <InputLabel id="workspaceSelect">Nhóm</InputLabel>
+            <Select
+              labelId="workspaceSelect-label"
+              id="workspaceSelect"
+              value={currentWorkspace.id}
+              // onChange={handleChange}
+              label="Nhóm"
+            >
+              {listWorkspaces.map(workspace => (<MenuItem value={workspace.id}>{workspace.name}</MenuItem>))
+            }
+            </Select>
+          </FormControl>
+        </ListItem>   
         {navigatePath.main.map((path, index) => {
           if (path.childPath) {
             return (
@@ -189,7 +218,7 @@ function DrawerCustom() {
                           component={Link}
                           to={`${child.path}`}
                           button
-                          key={childIndex}
+                          key={`manage${childIndex}`}
                           className={classes.nested}
                         >
                           <ListItemIcon>{getIcon(child.icon)}</ListItemIcon>

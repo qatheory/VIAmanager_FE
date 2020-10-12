@@ -1,5 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector, useDispatch } from "react-redux";
+import Commons from "_helpers/commons.js";
 import {
   Paper,
   Table,
@@ -10,7 +12,8 @@ import {
   TableHead,
   TablePagination,
 } from "@material-ui/core";
-
+import axios from "axios";
+import Constants from "_helpers/constants.js";
 const columns = [
   { id: "via", label: "VIA", minWidth: 100 },
   { id: "viaID", label: "ID", minWidth: 170 },
@@ -38,14 +41,6 @@ function createData(via, viaID, status, ads, options) {
   return { via, viaID, status, ads, options };
 }
 
-const rows = [
-  createData("ta 01", "1324171354", "Hoạt động", 3),
-  createData("ta 02", "1403500365", "Bị dừng", 3),
-  createData("ta 03", "6048397321", "Hoạt động", 5),
-  createData("ta 04", "327167434", "Hoạt động", 1),
-  createData("ta 05", "37602103", "Hoạt động", 1),
-];
-
 const useStyles = makeStyles({
   root: {
     width: "100%",
@@ -55,9 +50,36 @@ const useStyles = makeStyles({
     maxHeight: 440,
   },
 });
+let stateWorkspace = null;
 
 export default function VIAList() {
   const classes = useStyles();
+  let currentWorkspace = useSelector(
+    (state) => state.workspaces.currentWorkspace
+  );
+
+  let listVias = [];
+  // React.useEffect(() => {
+  // console.log(currentWorkspace.id);
+  if (currentWorkspace.id && currentWorkspace.id != stateWorkspace) {
+    stateWorkspace = currentWorkspace.id;
+    axios({
+      url: `${Constants.API_DOMAIN}/api/vias/`,
+      method: "GET",
+      headers: Commons.header,
+      params: {
+        workspace: currentWorkspace.id,
+      },
+    })
+      .then((resp) => {
+        console.log(resp);
+        listVias = resp.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  // });
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -88,7 +110,7 @@ export default function VIAList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {listVias
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
@@ -119,7 +141,7 @@ export default function VIAList() {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={listVias.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
