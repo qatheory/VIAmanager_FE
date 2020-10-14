@@ -2,7 +2,9 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 import clsx from "clsx";
 import Home from "pages/Home";
-import ManageVIA from "pages/manageVIA/manageVIA";
+import ManageVIA from "pages/manage/manageVIA/manageVIA";
+import CreateVIA from "pages/manage/createVIA/createVIA";
+import ManageBM from "pages/manage/manageBM/manageBM";
 import { useSelector } from "react-redux";
 import { selectDrawerStatus } from "store/reducers/viewSettings";
 import {
@@ -169,6 +171,12 @@ function AdminLayout(props) {
             <Switch>
               <Route exact path="/admin" component={Home} />
               <Route exact path="/admin/manage-via" component={ManageVIA} />
+              <Route exact path="/admin/manage-bm" component={ManageBM} />
+              <Route
+                exact
+                path="/admin/manage-via/create"
+                component={CreateVIA}
+              />
             </Switch>
           </main>
         </Container>

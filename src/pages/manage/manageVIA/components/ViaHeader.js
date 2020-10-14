@@ -6,6 +6,8 @@ import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import SearchIcon from "@material-ui/icons/Search";
 import ListAltIcon from "@material-ui/icons/ListAlt";
+import { Link } from "react-router-dom";
+
 const useStyles = makeStyles((theme) => ({
   card__header__item: {
     margin: theme.spacing(1, 1),
@@ -107,6 +109,8 @@ function ViaHeader(props) {
         <Button
           variant="outlined"
           color="primary"
+          component={Link}
+          to="/admin/manage-via/create/"
           className={classes.card__header__item}
           endIcon={<PersonAddIcon></PersonAddIcon>}
         >

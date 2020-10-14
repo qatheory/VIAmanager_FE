@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import Commons from "_helpers/commons.js";
@@ -15,18 +15,12 @@ import {
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const columns = [
-  { id: "via", label: "VIA", minWidth: 100 },
-  { id: "viaID", label: "ID", minWidth: 170 },
+  { id: "name", label: "BM", minWidth: 100 },
+  { id: "BMID", label: "ID", minWidth: 170 },
+  { id: "accessToken", label: "Token", minWidth: 170 },
   {
     id: "status",
     label: "Trạng thái",
-    minWidth: 100,
-    align: "right",
-  },
-  {
-    id: "ads",
-    label: "Tài khoản Ads",
-    minWidth: 100,
     align: "right",
   },
   {
@@ -37,10 +31,6 @@ const columns = [
   },
 ];
 
-function createData(via, viaID, status, ads, options) {
-  return { via, viaID, status, ads, options };
-}
-
 const useStyles = makeStyles({
   root: {
     width: "100%",
@@ -50,43 +40,41 @@ const useStyles = makeStyles({
     maxHeight: 440,
   },
 });
-let stateWorkspace = null;
 
-export default function VIAList() {
+export default function BMList() {
   const classes = useStyles();
   let currentWorkspace = useSelector(
     (state) => state.workspaces.currentWorkspace
   );
-
-  let listVias = [];
   // React.useEffect(() => {
   // console.log(currentWorkspace.id);
-  if (currentWorkspace.id && currentWorkspace.id != stateWorkspace) {
-    stateWorkspace = currentWorkspace.id;
-    axios({
-      url: `${Constants.API_DOMAIN}/api/vias/`,
-      method: "GET",
-      headers: Commons.header,
-      params: {
-        workspace: currentWorkspace.id,
-      },
-    })
-      .then((resp) => {
-        console.log(resp);
-        listVias = resp.data;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  // });
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+  // });
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [listBMs, setListBMs] = React.useState([]);
+  React.useEffect(() => {
+    if (currentWorkspace.id != null) {
+      axios({
+        url: `${Constants.API_DOMAIN}/api/bms/`,
+        method: "GET",
+        headers: Commons.header,
+        params: {
+          workspace: currentWorkspace.id,
+        },
+      })
+        .then((resp) => {
+          setListBMs(resp.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [currentWorkspace.id]);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
@@ -110,13 +98,20 @@ export default function VIAList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {listVias
+            {listBMs
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.viaID}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     {columns.map((column, colIndex) => {
                       const value = row[column.id];
+                      if (colIndex == 3) {
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            this is key
+                          </TableCell>
+                        );
+                      }
                       if (colIndex == 4) {
                         return (
                           <TableCell key={column.id} align={column.align}>
@@ -141,7 +136,7 @@ export default function VIAList() {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25, 100]}
         component="div"
-        count={listVias.length}
+        count={listBMs.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
