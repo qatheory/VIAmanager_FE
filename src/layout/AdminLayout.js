@@ -5,6 +5,7 @@ import Home from "pages/Home";
 import ManageVIA from "pages/manage/manageVIA/manageVIA";
 import CreateVIA from "pages/manage/createVIA/createVIA";
 import ManageBM from "pages/manage/manageBM/manageBM";
+import AdsAccounts from "pages/adsAccounts/adsAccounts";
 import { useSelector } from "react-redux";
 import { selectDrawerStatus } from "store/reducers/viewSettings";
 import {
@@ -29,6 +30,7 @@ import RouterURL from "../routerURL/RouterURL";
 import { BrowserRouter as Router } from "react-router-dom";
 import DrawerCustom from "./components/drawer";
 import AppBarCustom from "./components/appBar";
+import manageWorkspace from "../pages/manageWorkspace/manageWorkspace";
 const drawerWidth = 300;
 
 const theme = createMuiTheme({
@@ -172,6 +174,8 @@ function AdminLayout(props) {
               <Route exact path="/admin" component={Home} />
               <Route exact path="/admin/manage-via" component={ManageVIA} />
               <Route exact path="/admin/manage-bm" component={ManageBM} />
+              <Route exact path="/admin/ads-accounts" component={AdsAccounts} />
+              <Route exact path="/admin/manage-workspace" component={manageWorkspace} />
               <Route
                 exact
                 path="/admin/manage-via/create"

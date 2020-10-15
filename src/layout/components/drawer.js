@@ -16,7 +16,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 
 import { closeDrawer, selectDrawerStatus, setLoggedOut, selectUsername } from "store/reducers/viewSettings";
-import { selectCurrentWorkspace,selectListWorkspaces,setCurrentWorkspace } from "store/reducers/workspaceSettings";
+import { selectCurrentWorkspace, selectListWorkspaces, setCurrentWorkspace } from "store/reducers/workspaceSettings";
 
 import InsertChartIcon from "@material-ui/icons/InsertChart";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
@@ -27,6 +27,7 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import LocalActivityIcon from '@material-ui/icons/LocalActivity';
 import { Link } from "react-router-dom";
 const drawerWidth = 300;
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     "font-weight": 600,
     color: "rgba(0,0,0,0.55)",
   },
-  workspaceSelect:{
+  workspaceSelect: {
     width: "100%"
   },
   drawer: {
@@ -65,6 +66,11 @@ let navigatePath = {
       icon: "InsertChartIcon",
     },
     {
+      text: "Tài khoản Ads",
+      path: "/admin/ads-accounts",
+      icon: "LocalActivityIcon",
+    },
+    {
       text: "Quản lý",
       icon: "BuildIcon",
       childPath: [
@@ -82,7 +88,7 @@ let navigatePath = {
     },
     {
       text: "Nhóm",
-      path: "/admin/users",
+      path: "/admin/manage-workspace",
       icon: "PeopleIcon",
     },
   ],
@@ -128,7 +134,7 @@ function DrawerCustom() {
   let username = useSelector(selectUsername);
   let currentWorkspace = useSelector(state => state.workspaces.currentWorkspace)
   let listWorkspaces = useSelector(state => state.workspaces.listWorkspaces)
-  
+
   const classes = useStyles();
   let [manageChildPath, setManageChildPath] = React.useState(new DrawerState());
   const dispatch = useDispatch();
@@ -180,10 +186,10 @@ function DrawerCustom() {
               label="Nhóm"
             >
               {listWorkspaces.map(workspace => (<MenuItem value={workspace.id}>{workspace.name}</MenuItem>))
-            }
+              }
             </Select>
           </FormControl>
-        </ListItem>   
+        </ListItem>
         {navigatePath.main.map((path, index) => {
           if (path.childPath) {
             return (

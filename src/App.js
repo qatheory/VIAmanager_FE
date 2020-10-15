@@ -32,8 +32,8 @@ function PrivateRoute({ component: Component, authed, ...rest }) {
         authed === true ? (
           <Component {...props} />
         ) : (
-          <Redirect to={{ pathname: "/login" }} />
-        )
+            <Redirect to={{ pathname: "/login" }} />
+          )
       }
     />
   );
@@ -78,12 +78,12 @@ function App(props) {
           };
         });
         dispatch(setListWorkspaces(listWorkspaces));
-      });
-      // .catch((err) => {
-      //   console.log(err);
-      //   props.history.push("/signin");
-      //   dispatch(setLoggedOut());
-      // });
+      })
+        .catch((err) => {
+          console.log(err);
+          props.history.push("/signin");
+          dispatch(setLoggedOut());
+        });
     }
   });
   const handleRedirection = () => {

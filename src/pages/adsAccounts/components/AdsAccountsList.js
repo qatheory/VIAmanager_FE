@@ -15,17 +15,18 @@ import {
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const columns = [
-  { id: "name", label: "BM", minWidth: 100 },
-  { id: "id", label: "ID", minWidth: 100 },
-  { id: "link", label: "link", minWidth: 170 },
+  { id: "name", label: "Tài khoản", minWidth: 100 },
+  { id: "via", label: "VIA", minWidth: 100 },
+  { id: "account_status", label: "Trạng thái", minWidth: 170 },
+  { id: "disable_reason", label: "Lý do bị hủy", minWidth: 170 },
   {
-    id: "payment_account_id",
-    label: "id tài khoản thanh toán",
+    id: "amount_spent",
+    label: "Số tiền đã tiêu",
     align: "right",
   },
   {
-    id: "verification_status",
-    label: "Trạng thái",
+    id: "balance",
+    label: "Hóa đơn",
     align: "right",
   },
   {
@@ -46,7 +47,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function BMList() {
+export default function AdsAccountsList() {
   const classes = useStyles();
   let currentWorkspace = useSelector(
     (state) => state.workspaces.currentWorkspace
@@ -58,11 +59,11 @@ export default function BMList() {
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [listBMs, setListBMs] = React.useState([]);
+  const [listAdsAccounts, setListAdsAccounts] = React.useState([]);
   React.useEffect(() => {
     if (currentWorkspace.id != null) {
       axios({
-        url: `${Constants.API_DOMAIN}/api/bms/`,
+        url: `${Constants.API_DOMAIN}/api/ads_acc/`,
         method: "GET",
         headers: Commons.header,
         params: {
@@ -70,7 +71,7 @@ export default function BMList() {
         },
       })
         .then((resp) => {
-          setListBMs(resp.data);
+          setListAdsAccounts(resp.data.data);
         })
         .catch((err) => {
           console.log(err);
@@ -103,14 +104,14 @@ export default function BMList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {listBMs
+            {listAdsAccounts
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     {columns.map((column, colIndex) => {
                       const value = row[column.id];
-                      if (colIndex == 5) {
+                      if (colIndex == 6) {
                         return (
                           <TableCell key={column.id} align={column.align}>
                             this is options
@@ -134,7 +135,7 @@ export default function BMList() {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25, 100]}
         component="div"
-        count={listBMs.length}
+        count={listAdsAccounts.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}

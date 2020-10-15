@@ -37,9 +37,6 @@ const columns = [
   },
 ];
 
-function createData(via, viaID, status, ads, options) {
-  return { via, viaID, status, ads, options };
-}
 
 const useStyles = makeStyles({
   root: {
