@@ -2,123 +2,121 @@ import React from "react";
 import { makeStyles, theme } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import {
-    Paper,
-    Typography,
-    Fade,
-    Grid,
-    TextField,
-    FormControlLabel,
-    Checkbox,
-    Button,
+	Paper,
+	Typography,
+	Fade,
+	Grid,
+	TextField,
+	FormControlLabel,
+	Checkbox,
+	Button,
 } from "@material-ui/core";
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 import Commons from "_helpers/commons.js";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        padding: "0px",
-    },
-    cardHeader: {
-        // "justify-content": "flex-end",
-        display: "flex",
-    },
-    layout: {
-        width: "auto",
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-            width: 600,
-            marginLeft: "auto",
-            marginRight: "auto",
-        },
-    },
-    paper: {
-        marginTop: theme.spacing(3),
-        marginBottom: theme.spacing(3),
-        padding: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-            marginTop: theme.spacing(6),
-            marginBottom: theme.spacing(6),
-            padding: theme.spacing(3),
-        },
-    },
-    buttons: {
-        display: "flex",
-        justifyContent: "flex-end",
-    },
-    button: {
-        marginTop: theme.spacing(3),
-        marginLeft: theme.spacing(1),
-    },
+	root: {
+		padding: "0px",
+	},
+	cardHeader: {
+		// "justify-content": "flex-end",
+		display: "flex",
+	},
+	layout: {
+		width: "auto",
+		marginLeft: theme.spacing(2),
+		marginRight: theme.spacing(2),
+		[theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+			width: 600,
+			marginLeft: "auto",
+			marginRight: "auto",
+		},
+	},
+	paper: {
+		marginTop: theme.spacing(3),
+		marginBottom: theme.spacing(3),
+		padding: theme.spacing(2),
+		[theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+			marginTop: theme.spacing(6),
+			marginBottom: theme.spacing(6),
+			padding: theme.spacing(3),
+		},
+	},
+	buttons: {
+		display: "flex",
+		justifyContent: "flex-end",
+	},
+	button: {
+		marginTop: theme.spacing(3),
+		marginLeft: theme.spacing(1),
+	},
 }));
 function CreateVIA(props) {
-    const classes = useStyles();
-    let currentWorkspace = useSelector(
-        (state) => state.workspaces.currentWorkspace
-    );
+	let header = Commons.header();
+	const classes = useStyles();
+	let currentWorkspace = useSelector(
+		(state) => state.workspaces.currentWorkspace
+	);
 
-    const [formState, setFormState] = React.useState({
-        formValues: {
-            workspaceName: "",
-            accessToken: "",
-            AppID: "",
-        },
-    });
-    React.useEffect(() => {
-        if (currentWorkspace.id != null) {
-            axios({
-                url: `${Constants.API_DOMAIN}/api/workspace/${currentWorkspace.id}/`,
-                method: "GET",
-                headers: Commons.header,
-            })
-                .then((resp) => {
-                    console.log(resp.data)
-                    setFormState(
-                        {
-                            formValues:{
-                                workspaceName: resp.data.name,
-                                accessToken: resp.data.accessToken,
-                                AppID: resp.data.appID
-                            }
-                        });
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    }, [currentWorkspace.id]);
-    const handleChange = ({ target }) => {
-        const { formValues } = formState;
-        formValues[target.name] = target.value;
-        setFormState({ formValues });
-        // handleValidation(target);
-    };
-    const handleCancel = () => {
-        props.history.push("/admin/manage-via");
-    };
-    const handleSubmit = () => {
-        const { formValues } = formState;
-        console.log(formValues);
-        var bodyFormData = new FormData();
-        bodyFormData.append('name', formValues.workspaceName);
-        bodyFormData.append('accessToken', formValues.accessToken);
-        bodyFormData.append('appID', formValues.AppID);
-        axios({
-            url: `${Constants.API_DOMAIN}/api/workspace/${currentWorkspace.id}/`,
-            method: "PUT",
-            headers: Commons.header,
-            data: bodyFormData
-        })
-
-            .then((resp) => {
-                console.log(resp.data);
-            })
-            // .catch((err) => {
-            //     console.log(err);
-            // });
-    };
-    return (
+	const [formState, setFormState] = React.useState({
+		formValues: {
+			workspaceName: "",
+			accessToken: "",
+			AppID: "",
+		},
+	});
+	React.useEffect(() => {
+		if (currentWorkspace.id != null) {
+			axios({
+				url: `${Constants.API_DOMAIN}/api/workspace/${currentWorkspace.id}/`,
+				method: "GET",
+				headers: header,
+			})
+				.then((resp) => {
+					console.log(resp.data);
+					setFormState({
+						formValues: {
+							workspaceName: resp.data.name,
+							accessToken: resp.data.accessToken,
+							AppID: resp.data.appID,
+						},
+					});
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		}
+	}, [currentWorkspace.id]);
+	const handleChange = ({ target }) => {
+		const { formValues } = formState;
+		formValues[target.name] = target.value;
+		setFormState({ formValues });
+		// handleValidation(target);
+	};
+	const handleCancel = () => {
+		props.history.push("/admin/manage-via");
+	};
+	const handleSubmit = () => {
+		const { formValues } = formState;
+		console.log(formValues);
+		var bodyFormData = new FormData();
+		bodyFormData.append("name", formValues.workspaceName);
+		bodyFormData.append("accessToken", formValues.accessToken);
+		bodyFormData.append("appID", formValues.AppID);
+		axios({
+			url: `${Constants.API_DOMAIN}/api/workspace/${currentWorkspace.id}/`,
+			method: "PUT",
+			headers: header,
+			data: bodyFormData,
+		}).then((resp) => {
+			console.log(resp.data);
+		});
+		// .catch((err) => {
+		//     console.log(err);
+		// });
+	};
+	return (
 		<div>
 			<Fade in={true}>
 				<div className={classes.layout}>

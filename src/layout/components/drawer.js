@@ -111,6 +111,8 @@ function getIcon(icon) {
       return <PeopleIcon />;
     case "AccountCircleIcon":
       return <AccountCircleIcon />;
+    case "LocalActivityIcon":
+      return <LocalActivityIcon />
     default:
       return <SentimentVeryDissatisfiedIcon />;
   }
