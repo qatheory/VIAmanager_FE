@@ -11,12 +11,16 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 
-import { closeDrawer, selectDrawerStatus, setLoggedOut, selectUsername } from "store/reducers/viewSettings";
-import { selectCurrentWorkspace, selectListWorkspaces, setCurrentWorkspace } from "store/reducers/workspaceSettings";
+import {
+  closeDrawer,
+  selectDrawerStatus,
+  setLoggedOut,
+  selectUsername,
+} from "store/reducers/viewSettings";
 
 import InsertChartIcon from "@material-ui/icons/InsertChart";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
@@ -26,8 +30,8 @@ import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import LocalActivityIcon from '@material-ui/icons/LocalActivity';
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import LocalActivityIcon from "@material-ui/icons/LocalActivity";
 import { Link } from "react-router-dom";
 const drawerWidth = 300;
 const useStyles = makeStyles((theme) => ({
@@ -37,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     color: "rgba(0,0,0,0.55)",
   },
   workspaceSelect: {
-    width: "100%"
+    width: "100%",
   },
   drawer: {
     width: drawerWidth,
@@ -86,18 +90,13 @@ let navigatePath = {
         },
       ],
     },
-    {
-      text: "Nhóm",
-      path: "/admin/manage-workspace",
-      icon: "PeopleIcon",
-    },
   ],
   personal: [
     {
       text: "Hồ sơ",
       path: "/admin/user",
       icon: "AccountCircleIcon",
-    }
+    },
   ],
 };
 
@@ -112,7 +111,7 @@ function getIcon(icon) {
     case "AccountCircleIcon":
       return <AccountCircleIcon />;
     case "LocalActivityIcon":
-      return <LocalActivityIcon />
+      return <LocalActivityIcon />;
     default:
       return <SentimentVeryDissatisfiedIcon />;
   }
@@ -134,8 +133,6 @@ class DrawerState {
 function DrawerCustom() {
   let drawerStatus = useSelector(selectDrawerStatus);
   let username = useSelector(selectUsername);
-  let currentWorkspace = useSelector(state => state.workspaces.currentWorkspace)
-  let listWorkspaces = useSelector(state => state.workspaces.listWorkspaces)
 
   const classes = useStyles();
   let [manageChildPath, setManageChildPath] = React.useState(new DrawerState());
@@ -149,10 +146,10 @@ function DrawerCustom() {
     }
   };
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    dispatch(setLoggedOut())
-  }
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    dispatch(setLoggedOut());
+  };
   return (
     <Drawer
       className={classes.drawer}
@@ -174,24 +171,6 @@ function DrawerCustom() {
       <Divider />
 
       <List>
-        <ListItem
-          button
-          key="workspace"
-        >
-          <FormControl variant="outlined" className={classes.workspaceSelect}>
-            <InputLabel id="workspaceSelect">Nhóm</InputLabel>
-            <Select
-              labelId="workspaceSelect-label"
-              id="workspaceSelect"
-              value={currentWorkspace.id}
-              // onChange={handleChange}
-              label="Nhóm"
-            >
-              {listWorkspaces.map(workspace => (<MenuItem value={workspace.id}>{workspace.name}</MenuItem>))
-              }
-            </Select>
-          </FormControl>
-        </ListItem>
         {navigatePath.main.map((path, index) => {
           if (path.childPath) {
             return (
@@ -211,8 +190,8 @@ function DrawerCustom() {
                   {manageChildPath.get(path.path) ? (
                     <ExpandLess />
                   ) : (
-                      <ExpandMore />
-                    )}
+                    <ExpandMore />
+                  )}
                 </ListItem>
                 <Collapse
                   in={manageChildPath.get(path.path)}
@@ -256,7 +235,9 @@ function DrawerCustom() {
           </ListItem>
         ))}
         <ListItem button onClick={() => handleLogout()} key={"logout"}>
-          <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+          <ListItemIcon>
+            <ExitToAppIcon />
+          </ListItemIcon>
           <ListItemText primary="Đăng xuất" />
         </ListItem>
       </List>

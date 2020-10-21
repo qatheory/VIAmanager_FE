@@ -1,11 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit'
-import viewSettingsReducer from './reducers/viewSettings'
-import workspaceSettingsReducer from './reducers/workspaceSettings'
-
+import { configureStore } from "@reduxjs/toolkit";
+import viewSettingsReducer from "./reducers/viewSettings";
+import viaSlice from "./reducers/via";
 export default configureStore({
-    reducer: {
-        workspaces: workspaceSettingsReducer,
-        viewSettings: viewSettingsReducer,
-        
-    }
-})
+  reducer: {
+    viewSettings: viewSettingsReducer,
+    via: viaSlice,
+  },
+});

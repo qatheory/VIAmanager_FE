@@ -54,9 +54,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 function CreateVIA(props) {
 	const classes = useStyles();
-	let currentWorkspace = useSelector(
-		(state) => state.workspaces.currentWorkspace
-	);
 	const [formState, setFormState] = React.useState({
 		formValues: {
 			viaName: "",
@@ -100,7 +97,6 @@ function CreateVIA(props) {
 			// label: formValues.viaLabel,
 			dateOfBirth: formValues.viaDob,
 			// gender: formValues.viaGender,
-			workspace: currentWorkspace.id,
 			status: 1,
 		};
 		console.log(data);

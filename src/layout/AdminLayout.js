@@ -2,10 +2,10 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 import clsx from "clsx";
 import Home from "pages/Home";
-import ManageVIA from "pages/manage/manageVIA/manageVIA";
-import CreateVIA from "pages/manage/createVIA/createVIA";
-import ManageBM from "pages/manage/manageBM/manageBM";
-import AdsAccounts from "pages/adsAccounts/adsAccounts";
+import Via from "pages/manage/Via/Via";
+import CreateVia from "pages/manage/Via/CreateVia/CreateVia";
+import Bm from "pages/manage/Bm/Bm";
+import AdsAccounts from "pages/AdsAccounts/AdsAccounts";
 import { useSelector } from "react-redux";
 import { selectDrawerStatus } from "store/reducers/viewSettings";
 import {
@@ -26,11 +26,9 @@ import {
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MailIcon from "@material-ui/icons/Mail";
-import RouterURL from "../routerURL/RouterURL";
 import { BrowserRouter as Router } from "react-router-dom";
 import DrawerCustom from "./components/drawer";
 import AppBarCustom from "./components/appBar";
-import manageWorkspace from "../pages/manageWorkspace/manageWorkspace";
 const drawerWidth = 300;
 
 const theme = createMuiTheme({
@@ -172,14 +170,13 @@ function AdminLayout(props) {
             <div className={classes.toolbar} />
             <Switch>
               <Route exact path="/admin" component={Home} />
-              <Route exact path="/admin/manage-via" component={ManageVIA} />
-              <Route exact path="/admin/manage-bm" component={ManageBM} />
+              <Route exact path="/admin/manage-via" component={Via} />
+              <Route exact path="/admin/manage-bm" component={Bm} />
               <Route exact path="/admin/ads-accounts" component={AdsAccounts} />
-              <Route exact path="/admin/manage-workspace" component={manageWorkspace} />
               <Route
                 exact
                 path="/admin/manage-via/create"
-                component={CreateVIA}
+                component={CreateVia}
               />
             </Switch>
           </main>

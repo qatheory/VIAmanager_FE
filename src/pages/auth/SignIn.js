@@ -65,10 +65,10 @@ export default function SignIn(props) {
         } else {
           sessionStorage.setItem("token", res.data.token);
         }
-        console.log(sessionStorage.getItem("token"))
+        console.log(sessionStorage.getItem("token"));
         dispatch(setLoggedIn());
         dispatch(setUsername(res.data.user.username));
-        props.history.push("/admin/manage-via");
+        props.history.push("/admin/ads-accounts");
       }
     });
   };

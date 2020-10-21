@@ -15,18 +15,17 @@ import {
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const columns = [
-  { id: "name", label: "Tài khoản", minWidth: 100 },
-  { id: "via", label: "VIA", minWidth: 100 },
-  { id: "account_status", label: "Trạng thái", minWidth: 170 },
-  { id: "disable_reason", label: "Lý do bị hủy", minWidth: 170 },
+  { id: "name", label: "BM", minWidth: 100 },
+  { id: "id", label: "ID", minWidth: 100 },
+  { id: "link", label: "link", minWidth: 170 },
   {
-    id: "amount_spent",
-    label: "Số tiền đã tiêu",
+    id: "payment_account_id",
+    label: "id tài khoản thanh toán",
     align: "right",
   },
   {
-    id: "balance",
-    label: "Hóa đơn",
+    id: "verification_status",
+    label: "Trạng thái",
     align: "right",
   },
   {
@@ -47,21 +46,21 @@ const useStyles = makeStyles({
   },
 });
 
-export default function AdsAccountsList() {
+export default function BMList() {
+  let header = Commons.header();
   const classes = useStyles();
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [listAdsAccounts, setListAdsAccounts] = React.useState([]);
+  const [listBMs, setListBMs] = React.useState([]);
   React.useEffect(() => {
-    let header = Commons.header();
     axios({
-      url: `${Constants.API_DOMAIN}/api/ads_acc/`,
+      url: `${Constants.API_DOMAIN}/api/bms/`,
       method: "GET",
       headers: header,
     })
       .then((resp) => {
-        setListAdsAccounts(resp.data.data);
+        setListBMs(resp.data);
       })
       .catch((err) => {
         console.log(err);
@@ -93,14 +92,14 @@ export default function AdsAccountsList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {listAdsAccounts
+            {listBMs
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     {columns.map((column, colIndex) => {
                       const value = row[column.id];
-                      if (colIndex == 6) {
+                      if (colIndex == 5) {
                         return (
                           <TableCell key={column.id} align={column.align}>
                             this is options
@@ -124,7 +123,7 @@ export default function AdsAccountsList() {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25, 100]}
         component="div"
-        count={listAdsAccounts.length}
+        count={listBMs.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
