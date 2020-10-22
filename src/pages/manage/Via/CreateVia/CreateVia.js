@@ -94,9 +94,9 @@ function CreateVIA(props) {
 			tfa: formValues.viaTFA,
 			fbLink: formValues.viaFbLink,
 			fbName: formValues.viaFbName,
-			// label: formValues.viaLabel,
+			label: formValues.viaLabel,
 			dateOfBirth: formValues.viaDob,
-			// gender: formValues.viaGender,
+			gender: formValues.viaGender,
 			status: 1,
 		};
 		console.log(data);
@@ -105,12 +105,13 @@ function CreateVIA(props) {
 			method: "POST",
 			headers: header,
 			data: data,
-		}).then((resp) => {
-			console.log(resp.data);
-		});
-		// .catch((err) => {
-		// 	console.log(err);
-		// });
+		})
+			.then((resp) => {
+				console.log(resp.data);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 	return (
 		<div>

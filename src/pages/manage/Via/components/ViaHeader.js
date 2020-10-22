@@ -7,118 +7,139 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import SearchIcon from "@material-ui/icons/Search";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setLoadViasStatus } from "../../../../store/reducers/via";
 
 const useStyles = makeStyles((theme) => ({
-  card__header__item: {
-    margin: theme.spacing(1, 1),
-  },
-  full__width: {
-    [theme.breakpoints.down("sm")]: {
-      //   marginLeft: theme.spacing(3),
-      width: "100%",
-    },
-  },
-  auto_float_right: {
-    [theme.breakpoints.down("sm")]: {
-      "margin-left": "auto",
-      width: "229px",
-    },
-  },
-  floatLeft: {
-    "margin-right": "auto",
-  },
-  floatRight: {
-    "margin-left": "auto",
-  },
-  inputRoot: {
-    color: "inherit",
-  },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "100%",
-    },
-  },
-  search: {
-    position: "relative",
-    borderRadius: 8,
-    borderColor: "#bdbdbd",
-    border: 2,
-    borderStyle: "solid",
-    backgroundColor: fade("#ffffff", 0.15),
-    "&:hover": {
-      backgroundColor: fade("#e0e0e0", 0.15),
-    },
-    // marginRight: theme.spacing(0),
-    marginLeft: 0,
-    width: "100%",
-    // [theme.breakpoints.up("md")]: {
-    //   //   marginLeft: theme.spacing(3),
-    //   width: "60%",
-    // },
-  },
-  searchIcon: {
-    padding: theme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+	card__header__item: {
+		margin: theme.spacing(1, 1),
+	},
+	full__width: {
+		[theme.breakpoints.down("sm")]: {
+			//   marginLeft: theme.spacing(3),
+			width: "100%",
+		},
+	},
+	auto_float_right: {
+		[theme.breakpoints.down("sm")]: {
+			"margin-left": "auto",
+			width: "229px",
+		},
+	},
+	floatLeft: {
+		"margin-right": "auto",
+	},
+	floatRight: {
+		"margin-left": "auto",
+	},
+	inputRoot: {
+		color: "inherit",
+	},
+	inputInput: {
+		padding: theme.spacing(1, 1, 1, 0),
+		// vertical padding + font size from searchIcon
+		paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+		transition: theme.transitions.create("width"),
+		width: "100%",
+		[theme.breakpoints.up("md")]: {
+			width: "100%",
+		},
+	},
+	search: {
+		position: "relative",
+		borderRadius: 8,
+		borderColor: "#bdbdbd",
+		border: 2,
+		borderStyle: "solid",
+		backgroundColor: fade("#ffffff", 0.15),
+		"&:hover": {
+			backgroundColor: fade("#e0e0e0", 0.15),
+		},
+		// marginRight: theme.spacing(0),
+		marginLeft: 0,
+		width: "100%",
+		// [theme.breakpoints.up("md")]: {
+		//   //   marginLeft: theme.spacing(3),
+		//   width: "60%",
+		// },
+	},
+	searchIcon: {
+		padding: theme.spacing(0, 2),
+		height: "100%",
+		position: "absolute",
+		pointerEvents: "none",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+	},
 }));
 function ViaHeader(props) {
-  const classes = useStyles();
-  return (
-    <Grid container spacing={0}>
-      <Grid container justify="flex-start" item xs={12} md={8}>
-        <div className={clsx(classes.card__header__item, classes.full__width)}>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Tìm VIA..."
-              classes={{ input: classes.inputInput, root: classes.inputRoot }}
-              inputProps={{ "aria-label": "search" }}
-            />
-          </div>
-        </div>
-        <Button
-          variant="outlined"
-          color="primary"
-          className={clsx(classes.card__header__item, classes.auto_float_right)}
-          endIcon={<ListAltIcon></ListAltIcon>}
-        >
-          Tìm kiếm nâng cao
-        </Button>
-      </Grid>
-      <Grid container justify="flex-end" item md={4}>
-        <Button
-          variant="outlined"
-          color="primary"
-          className={clsx(classes.card__header__item, classes.floatRight)}
-          endIcon={<RefreshIcon></RefreshIcon>}
-        >
-          Làm mới
-        </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          component={Link}
-          to="/admin/manage-via/create/"
-          className={classes.card__header__item}
-          endIcon={<PersonAddIcon></PersonAddIcon>}
-        >
-          Thêm
-        </Button>
-      </Grid>
-    </Grid>
-  );
+	const classes = useStyles();
+	const dispatch = useDispatch();
+	const handleRefresh = () => {
+		dispatch(setLoadViasStatus(true));
+	};
+	return (
+		<Grid container spacing={0}>
+			<Grid container justify="flex-start" item xs={12} md={8}>
+				<div
+					className={clsx(
+						classes.card__header__item,
+						classes.full__width
+					)}
+				>
+					<div className={classes.search}>
+						<div className={classes.searchIcon}>
+							<SearchIcon />
+						</div>
+						<InputBase
+							placeholder="Tìm VIA..."
+							classes={{
+								input: classes.inputInput,
+								root: classes.inputRoot,
+							}}
+							inputProps={{ "aria-label": "search" }}
+						/>
+					</div>
+				</div>
+				<Button
+					variant="outlined"
+					color="primary"
+					className={clsx(
+						classes.card__header__item,
+						classes.auto_float_right
+					)}
+					endIcon={<ListAltIcon></ListAltIcon>}
+				>
+					Tìm kiếm nâng cao
+				</Button>
+			</Grid>
+			<Grid container justify="flex-end" item md={4}>
+				<Button
+					variant="outlined"
+					color="primary"
+					className={clsx(
+						classes.card__header__item,
+						classes.floatRight
+					)}
+					endIcon={<RefreshIcon></RefreshIcon>}
+					onClick={handleRefresh}
+				>
+					Làm mới
+				</Button>
+				<Button
+					variant="outlined"
+					color="primary"
+					component={Link}
+					to="/admin/manage-via/create/"
+					className={classes.card__header__item}
+					endIcon={<PersonAddIcon></PersonAddIcon>}
+				>
+					Thêm
+				</Button>
+			</Grid>
+		</Grid>
+	);
 }
 
 export default ViaHeader;

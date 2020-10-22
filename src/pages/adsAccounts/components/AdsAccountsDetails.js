@@ -14,14 +14,15 @@ import { useSelector, useDispatch } from "react-redux";
 import {
 	toggleDetailsDialog,
 	closeDetailsDialog,
-	setViaDetailID,
-} from "store/reducers/via";
+	setAdsAccDetailID,
+} from "store/reducers/adsAcc";
+
 import Commons from "_helpers/commons.js";
 import Constants from "_helpers/constants.js";
 import axios from "axios";
 
-export default function ViaDetails(props) {
-	const [open, setOpen] = React.useState(false);
+export default function AdsAccountsDetails(props) {
+	// const [open, setOpen] = React.useState(false);
 	const [formState, setFormState] = React.useState({
 		formValues: {
 			viaName: "",
@@ -45,18 +46,15 @@ export default function ViaDetails(props) {
 		// handleValidation(target);
 	};
 	let dispatch = useDispatch();
-	let viaDetailsDialogStatus = useSelector(
-		(state) => state.via.detailsDialog
+	let adsAccDetailsDialogStatus = useSelector(
+		(state) => state.adsAcc.detailsDialog
 	);
-	let viaID = useSelector((state) => state.via.viaID);
+	let adsAccID = useSelector((state) => state.adsAcc.adsAccID);
 	useEffect(() => {
-		setOpen(viaDetailsDialogStatus);
-	}, [viaDetailsDialogStatus]);
-	useEffect(() => {
-		if (viaID != "") {
+		if (adsAccID != "") {
 			let header = Commons.header();
 			axios({
-				url: `${Constants.API_DOMAIN}/api/via/${viaID}/`,
+				url: `${Constants.API_DOMAIN}/api/ads_acc/${adsAccID}/`,
 				method: "GET",
 				headers: header,
 			})
@@ -80,13 +78,13 @@ export default function ViaDetails(props) {
 					console.log(err);
 				});
 		}
-	}, [viaID]);
+	}, [adsAccID]);
 	// const handleClickOpen = () => {
 	//   setOpen(true);
 	// };
 
 	const handleClose = () => {
-		dispatch(setViaDetailID(""));
+		dispatch(setAdsAccDetailID(""));
 		dispatch(closeDetailsDialog());
 	};
 
@@ -115,7 +113,7 @@ export default function ViaDetails(props) {
 		}
 		console.log(data);
 		axios({
-			url: `${Constants.API_DOMAIN}/api/via/${viaID}/`,
+			url: `${Constants.API_DOMAIN}/api/via/${adsAccID}/`,
 			method: "PUT",
 			headers: header,
 			data: data,
@@ -136,7 +134,7 @@ export default function ViaDetails(props) {
         Open form dialog
       </Button> */}
 			<Dialog
-				open={open}
+				open={adsAccDetailsDialogStatus}
 				onClose={handleClose}
 				aria-labelledby="form-dialog-title"
 			>
