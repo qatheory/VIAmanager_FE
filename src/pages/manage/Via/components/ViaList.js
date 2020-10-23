@@ -29,8 +29,7 @@ import {
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import HowToRegIcon from "@material-ui/icons/HowToReg";
-import ViaDetails from "pages/manage/Via/components/ViaDetails";
-import ViaDeleteAlert from "pages/manage/Via/components/ViaDeleteAlert";
+
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const columns = [
@@ -174,16 +173,16 @@ export default function VIAList() {
 														</TableCell>
 													);
 												}
-												if (colIndex == 4) {
-													return (
-														<TableCell
-															key={column.id}
-															align={column.align}
-														>
-															this is key
-														</TableCell>
-													);
-												}
+												// if (colIndex == 4) {
+												// 	return (
+												// 		<TableCell
+												// 			key={column.id}
+												// 			align={column.align}
+												// 		>
+												// 			this is key
+												// 		</TableCell>
+												// 	);
+												// }
 												if (colIndex == 5) {
 													return (
 														<TableCell
@@ -284,8 +283,6 @@ export default function VIAList() {
 					onChangeRowsPerPage={handleChangeRowsPerPage}
 				/>
 			</Paper>
-			<ViaDetails />
-			<ViaDeleteAlert />
 		</React.Fragment>
 	);
 }
