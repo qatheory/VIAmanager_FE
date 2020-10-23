@@ -65,7 +65,7 @@ function CreateVIA(props) {
 			viaTFA: "",
 			viaFbName: "",
 			viaFbLink: "",
-			viaGender: "",
+			viaGender: undefined,
 			viaDob: undefined,
 			viaLabel: "",
 		},
@@ -95,10 +95,14 @@ function CreateVIA(props) {
 			fbLink: formValues.viaFbLink,
 			fbName: formValues.viaFbName,
 			label: formValues.viaLabel,
-			dateOfBirth: formValues.viaDob,
-			gender: formValues.viaGender,
 			status: 1,
 		};
+		if (formValues.viaDob) {
+			data.dateOfBirth = formValues.viaDob;
+		}
+		if (formValues.viaDob) {
+			data.gender = formValues.viaGender;
+		}
 		console.log(data);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/vias/`,
@@ -107,9 +111,11 @@ function CreateVIA(props) {
 			data: data,
 		})
 			.then((resp) => {
-				console.log(resp.data);
+				props.history.push("/admin/manage-via");
+				// console.log(resp.data);
 			})
 			.catch((err) => {
+				props.history.push("/admin/manage-via");
 				console.log(err);
 			});
 	};

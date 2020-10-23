@@ -19,10 +19,18 @@ import {
 	openDetailsDialog,
 	setViaDetailID,
 	setLoadViasStatus,
+	setViaDeleteName,
+	openDeleteDialog,
+	closeLoginDialog,
+	openLoginDialog,
+	setViaLoginInfo,
+	setViaDeleteID,
 } from "store/reducers/via";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import HowToRegIcon from "@material-ui/icons/HowToReg";
 import ViaDetails from "pages/manage/Via/components/ViaDetails";
+import ViaDeleteAlert from "pages/manage/Via/components/ViaDeleteAlert";
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const columns = [
@@ -66,6 +74,7 @@ export default function VIAList() {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	let isLoadingVias = useSelector((state) => state.via.isLoadingVias);
+	let searchParams = useSelector((state) => state.via.searchParams);
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(10);
 	const [listVias, setListVias] = React.useState([]);
@@ -75,15 +84,19 @@ export default function VIAList() {
 		}
 		dispatch(setLoadViasStatus(false));
 	}, [isLoadingVias]);
+
 	React.useEffect(() => {
 		getViasList();
 	}, []);
+
 	const getViasList = () => {
 		let header = Commons.header();
+		console.log(searchParams);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/vias/`,
 			method: "GET",
 			headers: header,
+			params: searchParams,
 		})
 			.then((resp) => {
 				dispatch(setLoadViasStatus(false));
@@ -104,6 +117,15 @@ export default function VIAList() {
 	const handleClickOpenViaDetails = (viaID) => {
 		dispatch(setViaDetailID(viaID));
 		dispatch(openDetailsDialog());
+	};
+	const handleClickOpenViaDelete = (id, name) => {
+		dispatch(setViaDeleteID(id));
+		dispatch(setViaDeleteName(name));
+		dispatch(openDeleteDialog());
+	};
+	const handleClickOpenViaLogin = (name, email, password, tfa) => {
+		dispatch(setViaLoginInfo({ name, email, password, tfa }));
+		dispatch(openLoginDialog());
 	};
 
 	return (
@@ -169,6 +191,28 @@ export default function VIAList() {
 															align={column.align}
 														>
 															<Tooltip
+																title="Thông tin đăng nhập"
+																placement="top"
+															>
+																<IconButton
+																	className={
+																		classes.optionButton
+																	}
+																	aria-label="Thông tin đăng nhập"
+																	color="primary"
+																	onClick={() =>
+																		handleClickOpenViaLogin(
+																			row.name,
+																			row.email,
+																			row.password,
+																			row.tfa
+																		)
+																	}
+																>
+																	<HowToRegIcon />
+																</IconButton>
+															</Tooltip>
+															<Tooltip
 																title="Chi tiết"
 																placement="top"
 															>
@@ -196,6 +240,12 @@ export default function VIAList() {
 																		classes.optionButton
 																	}
 																	aria-label="Xóa"
+																	onClick={() =>
+																		handleClickOpenViaDelete(
+																			row.id,
+																			row.name
+																		)
+																	}
 																>
 																	<DeleteIcon />
 																</IconButton>
@@ -235,6 +285,7 @@ export default function VIAList() {
 				/>
 			</Paper>
 			<ViaDetails />
+			<ViaDeleteAlert />
 		</React.Fragment>
 	);
 }
