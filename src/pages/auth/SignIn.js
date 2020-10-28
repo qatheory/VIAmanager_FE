@@ -60,6 +60,7 @@ export default function SignIn(props) {
       data: userInfo,
     }).then((res) => {
       if (res.data.token) {
+        console.log(res);
         if (remember) {
           localStorage.setItem("token", res.data.token);
         } else {
