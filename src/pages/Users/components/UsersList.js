@@ -18,18 +18,19 @@ import { red, amber } from "@material-ui/core/colors";
 import {
   toggleDetailsDialog,
   openDetailsDialog,
-  setAdsAccDetailID,
-  setLoadAdsAccStatus,
-  openAdsAccOwnersDialog,
-  setAdsAccOwnersId,
-  setAdsAccOwnersName,
-} from "store/reducers/adsAcc";
+  setUsersDetailID,
+  setLoadUsersStatus,
+  openUsersOwnersDialog,
+  setUsersOwnersId,
+  setUsersOwnersName,
+} from "store/reducers/users";
 import clsx from "clsx";
-import AdsAccountsDetails from "pages/AdsAccounts/components/AdsAccountsDetails";
-// import AdsAccountVia from "pages/AdsAccounts/components/AdsAccountVia";
+import UsersDetails from "pages/Users/components/UsersDetails";
+// import UsersountVia from "pages/Users/components/UsersountVia";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import LockOpenIcon from "@material-ui/icons/LockOpen";
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const showAccountStatus = (statusID) => {
@@ -90,33 +91,12 @@ const showAccountDisableReason = (statusID) => {
 
 const columns = [
   { id: "name", label: "Tài khoản", minWidth: 100 },
-  { id: "businessName", label: "BM", minWidth: 100 },
-  {
-    id: "account_status",
-    label: "Trạng thái",
-    minWidth: 170,
-    format: showAccountStatus,
-  },
-  {
-    id: "disable_reason",
-    label: "Lý do dừng hoạt động",
-    minWidth: 170,
-    format: showAccountDisableReason,
-  },
-  {
-    id: "amount_spent",
-    label: "Số tiền đã tiêu",
-    align: "right",
-  },
-  {
-    id: "balance",
-    label: "Hóa đơn",
-    align: "right",
-  },
+  { id: "group", label: "Nhóm", minWidth: 100 },
+  { id: "label", label: "Chú thích", minWidth: 100 },
   {
     id: "options",
     label: "Tùy chọn",
-    minWidth: 170,
+    // minWidth: 170,
     align: "right",
   },
 ];
@@ -141,46 +121,39 @@ const useStyles = makeStyles({
   },
 });
 
-export default function AdsAccountsList() {
+export default function UsersList() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  let isLoadingAdsAcc = useSelector((state) => state.adsAcc.isLoadingAdsAcc);
-  let selectedVia = useSelector((state) => state.adsAcc.selectedVia);
-  let selectedStatus = useSelector((state) => state.adsAcc.adsAccStatus);
-
+  let isLoadingUsers = useSelector((state) => state.users.isLoadingUsers);
+  let searchParams = useSelector((state) => state.users.searchParams);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [listAdsAccounts, setListAdsAccounts] = React.useState([]);
+  const [listUsers, setListUsers] = React.useState([]);
   React.useEffect(() => {
-    if (isLoadingAdsAcc == true) {
-      getAdsAccList();
+    if (isLoadingUsers == true) {
+      getUsersList();
     }
-    dispatch(setLoadAdsAccStatus(false));
-  }, [isLoadingAdsAcc]);
+    dispatch(setLoadUsersStatus(false));
+  }, [isLoadingUsers]);
 
   React.useEffect(() => {
-    getAdsAccList();
+    getUsersList();
   }, []);
 
-  const getAdsAccList = () => {
+  const getUsersList = () => {
     let header = Commons.header();
     axios({
-      url: `${Constants.API_DOMAIN}/api/ads_acc/`,
+      url: `${Constants.API_DOMAIN}/api/users/`,
       method: "GET",
       headers: header,
-      params: { via: selectedVia, status: selectedStatus },
+      params: searchParams,
     })
       .then((resp) => {
-        let adsAccounts = resp.data.map((adsAcc) => {
-          return adsAcc.business
-            ? { ...adsAcc, businessName: adsAcc.business.name }
-            : adsAcc;
-        });
-        dispatch(setLoadAdsAccStatus(false));
-        setListAdsAccounts(adsAccounts);
+        dispatch(setLoadUsersStatus(false));
+        setListUsers(resp.data);
       })
       .catch((err) => {
-        dispatch(setLoadAdsAccStatus(false));
+        dispatch(setLoadUsersStatus(false));
         console.log(err);
       });
   };
@@ -191,15 +164,18 @@ export default function AdsAccountsList() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  const handleClickOpenAdsAccDetails = (adsAccID) => {
-    dispatch(setAdsAccDetailID(adsAccID));
+  const handleClickOpenUsersDetails = (usersID) => {
+    dispatch(setUsersDetailID(usersID));
     dispatch(openDetailsDialog());
   };
-  const handleClickOpenAdsAccOwners = (owners, name) => {
-    owners = owners.map((owner) => owner.viaId);
-    dispatch(setAdsAccOwnersName(name));
-    dispatch(setAdsAccOwnersId(owners));
-    dispatch(openAdsAccOwnersDialog());
+  const handleClickDeleteUser = (usersID, username) => {
+    dispatch(setUserDeleteID(id));
+    dispatch(setUserDeleteName(username));
+    dispatch(openDeleteDialog());
+  };
+  const handleClickOpenUserResetPassword = (userId) => {
+    dispatch(setUserResetPasswordID(userId));
+    dispatch(openResetPasswordDialog());
   };
   const checkIfDanger = (status) => {
     if (status == 2 || status == 101 || status == 102 || status == 202) {
@@ -232,52 +208,48 @@ export default function AdsAccountsList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {listAdsAccounts
+              {listUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
-                    <TableRow
-                      className={clsx({
-                        [classes.rowDanger]: checkIfDanger(row.account_status),
-                        [classes.rowWarning]: checkIfWarning(
-                          row.account_status
-                        ),
-                      })}
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row.id}
-                    >
+                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                       {columns.map((column, colIndex) => {
                         const value = row[column.id];
-                        if (colIndex == 6) {
+                        if (colIndex == 3) {
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              {/* <Tooltip title="Chi tiết" placement="top">
+                              <Tooltip title="Chi tiết" placement="top">
                                 <IconButton
                                   className={classes.optionButton}
                                   aria-label="Chi tiết"
                                   color="primary"
                                   onClick={() =>
-                                    handleClickOpenAdsAccDetails(row.id)
+                                    handleClickOpenUsersDetails(row.id)
                                   }
                                 >
                                   <EditIcon />
                                 </IconButton>
-                              </Tooltip> */}
-                              <Tooltip title="Via sở hữu" placement="top">
+                              </Tooltip>
+                              <Tooltip title="Reset mật khẩu" placement="top">
                                 <IconButton
                                   className={classes.optionButton}
-                                  aria-label="Via sở hữu"
+                                  aria-label="Reset mật khẩu"
                                   color="primary"
                                   onClick={() =>
-                                    handleClickOpenAdsAccOwners(
-                                      row.owner,
-                                      row.name
-                                    )
+                                    handleClickOpenUserResetPassword(row.id)
                                   }
                                 >
-                                  <AccountBoxIcon />
+                                  <LockOpenIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Reset mật khẩu" placement="top">
+                                <IconButton
+                                  className={classes.optionButton}
+                                  aria-label="Reset mật khẩu"
+                                  color="primary"
+                                  onClick={() => handleClickDeleteUser(row.id)}
+                                >
+                                  <Delete />
                                 </IconButton>
                               </Tooltip>
                             </TableCell>
@@ -298,15 +270,15 @@ export default function AdsAccountsList() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25, 100]}
           component="div"
-          count={listAdsAccounts.length}
+          count={listUsers.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      <AdsAccountsDetails />
-      {/* <AdsAccountVia /> */}
+      <UsersDetails />
+      {/* <UsersountVia /> */}
     </React.Fragment>
   );
 }

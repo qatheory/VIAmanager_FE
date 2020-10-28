@@ -31,6 +31,7 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import LocalActivityIcon from "@material-ui/icons/LocalActivity";
 import { Link } from "react-router-dom";
 const drawerWidth = 300;
@@ -75,27 +76,42 @@ let navigatePath = {
       icon: "LocalActivityIcon",
     },
     {
-      text: "Quản lý",
+      text: "Quản lý Via",
+      path: "/admin/manage-via",
       icon: "BuildIcon",
-      childPath: [
-        {
-          text: "VIA Facebook",
-          path: "/admin/manage-via",
-          icon: "BuildIcon",
-        },
-        {
-          text: "Bussiness",
-          path: "/admin/manage-bm",
-          icon: "BuildIcon",
-        },
-      ],
     },
+    {
+      text: "Quản lý BM",
+      path: "/admin/manage-bm",
+      icon: "BuildIcon",
+    },
+    // {
+    //   text: "Quản lý",
+    //   icon: "BuildIcon",
+    //   childPath: [
+    //     {
+    //       text: "Quản lý Via",
+    //       path: "/admin/manage-via",
+    //       icon: "BuildIcon",
+    //     },
+    //     {
+    //       text: "Bussiness",
+    //       path: "/admin/manage-bm",
+    //       icon: "BuildIcon",
+    //     },
+    //   ],
+    // },
   ],
   personal: [
     {
       text: "Hồ sơ",
-      path: "/admin/user",
+      path: "/admin/profile",
       icon: "AccountCircleIcon",
+    },
+    {
+      text: "Nhân sự",
+      path: "/admin/users",
+      icon: "PeopleAltIcon",
     },
   ],
 };
@@ -112,6 +128,8 @@ function getIcon(icon) {
       return <AccountCircleIcon />;
     case "LocalActivityIcon":
       return <LocalActivityIcon />;
+    case "PeopleAltIcon":
+      return <PeopleAltIcon />;
     default:
       return <SentimentVeryDissatisfiedIcon />;
   }

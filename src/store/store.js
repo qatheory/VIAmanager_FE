@@ -1,12 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import viewSettingsReducer from "./reducers/viewSettings";
-import viaSlice from "./reducers/via";
-import adsAccSlice from "./reducers/adsAcc";
-
+import viaReducer from "./reducers/via";
+import adsAccSReducer from "./reducers/adsAcc";
+import bmReducer from "./reducers/bm";
 export default configureStore({
-	reducer: {
-		viewSettings: viewSettingsReducer,
-		via: viaSlice,
-		adsAcc: adsAccSlice,
-	},
+  reducer: {
+    viewSettings: viewSettingsReducer,
+    via: viaReducer,
+    adsAcc: adsAccSReducer,
+    bm: bmReducer,
+  },
 });

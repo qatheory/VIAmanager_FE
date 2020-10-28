@@ -12,8 +12,8 @@ import {
   Button,
 } from "@material-ui/core";
 import axios from "axios";
-import Constants from "../manage/Via/CreateVia/node_modules/_helpers/constants.js.js";
-import Commons from "../manage/Via/CreateVia/node_modules/_helpers/commons.js.js";
+import Constants from "../Via/CreateVia/node_modules/_helpers/constants.js.js";
+import Commons from "../Via/CreateVia/node_modules/_helpers/commons.js.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {

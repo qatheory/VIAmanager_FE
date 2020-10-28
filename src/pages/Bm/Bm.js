@@ -1,9 +1,10 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent, Fade, Button, Icon } from "@material-ui/core";
-import AdsAccountsList from "./components/AdsAccountsList.js";
-import AdsAccountsHeader from "./components/AdsAccountsHeader";
-import AdsAccountsOwners from "./components/AdsAccountsOwners";
+import BmList from "./components/BmList";
+import BmHeader from "./components/BmHeader";
+import BmOwners from "./components/BmOwners";
+import BmAdsAcc from "./components/BmAdsAcc";
 const useStyles = makeStyles({
   root: {
     padding: "0px",
@@ -13,23 +14,24 @@ const useStyles = makeStyles({
     display: "flex",
   },
 });
-function AdsAccounts(props) {
+function ManageBM(props) {
   const classes = useStyles();
   return (
     <div>
       <Fade in={true}>
         <Card>
           <CardContent className={classes.cardHeader}>
-            <AdsAccountsHeader />
+            <BmHeader />
           </CardContent>
           <CardContent className={classes.root}>
-            <AdsAccountsList />
+            <BmList />
           </CardContent>
         </Card>
       </Fade>
-      <AdsAccountsOwners />
+      <BmOwners />
+      <BmAdsAcc />
     </div>
   );
 }
 
-export default AdsAccounts;
+export default ManageBM;

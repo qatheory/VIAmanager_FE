@@ -1,8 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent, Fade, Button, Icon } from "@material-ui/core";
-import BMList from "./components/BmList";
-import BMHeader from "./components/BmHeader";
+import UsersList from "./components/UsersList.js";
+import UsersHeader from "./components/UsersHeader";
+import UsersOwners from "./components/UsersOwners";
 const useStyles = makeStyles({
   root: {
     padding: "0px",
@@ -12,22 +13,23 @@ const useStyles = makeStyles({
     display: "flex",
   },
 });
-function ManageBM(props) {
+function Users(props) {
   const classes = useStyles();
   return (
     <div>
       <Fade in={true}>
         <Card>
           <CardContent className={classes.cardHeader}>
-            <BMHeader />
+            <UsersHeader />
           </CardContent>
           <CardContent className={classes.root}>
-            <BMList />
+            <UsersList />
           </CardContent>
         </Card>
       </Fade>
+      <UsersOwners />
     </div>
   );
 }
 
-export default ManageBM;
+export default Users;
