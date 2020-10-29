@@ -22,7 +22,7 @@ function ManageVIA(props) {
       <Fade in={true}>
         <Card>
           <CardContent className={classes.cardHeader}>
-            <ViaHeader />
+            <ViaHeader props={props} />
           </CardContent>
           <CardContent className={classes.root}>
             <ViaList />

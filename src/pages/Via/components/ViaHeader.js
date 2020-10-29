@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
 }));
-function ViaHeader(props) {
+function ViaHeader({ props }) {
   const [advancedSearch, setAdvancedSearch] = React.useState(false);
   const [searchParamsForm, setSearchParamsForm] = React.useState({
     params: {
@@ -141,6 +141,9 @@ function ViaHeader(props) {
     params[target.getAttribute("data-name")] = target.value;
     setSearchParamsForm({ params });
   };
+  const handleAddVia = () => {
+    props.history.push("/admin/manage-via/create");
+  };
   return (
     <React.Fragment>
       <Grid container spacing={0}>
@@ -189,6 +192,15 @@ function ViaHeader(props) {
             className={clsx(classes.card__header__item, classes.floatRight)}
             endIcon={<RefreshIcon></RefreshIcon>}
             onClick={handleRefresh}
+          >
+            Làm mới
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            className={clsx(classes.card__header__item)}
+            endIcon={<PersonAddIcon></PersonAddIcon>}
+            onClick={handleAddVia}
           >
             Làm mới
           </Button>

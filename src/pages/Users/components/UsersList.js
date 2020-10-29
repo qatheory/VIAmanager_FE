@@ -16,83 +16,34 @@ import {
 } from "@material-ui/core";
 import { red, amber } from "@material-ui/core/colors";
 import {
-  toggleDetailsDialog,
   openDetailsDialog,
-  setUsersDetailID,
+  setUserDetailId,
   setLoadUsersStatus,
-  openUsersOwnersDialog,
-  setUsersOwnersId,
-  setUsersOwnersName,
-} from "store/reducers/users";
+  openUserDeleteDialog,
+  setUserDeleteId,
+  setUserDeleteName,
+  setUserResetPasswordId,
+  setUserResetPasswordName,
+  openUserResetPasswordDialog,
+} from "store/reducers/user";
 import clsx from "clsx";
 import UsersDetails from "pages/Users/components/UsersDetails";
-// import UsersountVia from "pages/Users/components/UsersountVia";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import axios from "axios";
 import Constants from "_helpers/constants.js";
-const showAccountStatus = (statusID) => {
-  switch (statusID) {
-    case 1:
-      return "Đang hoạt động";
-    case 2:
-      return "Vô hiệu hóa";
-    case 3:
-      return "Không ổn định";
-    case 7:
-      return "Đang được xét duyệt";
-    case 8:
-      return "Đang chờ xử lý";
-    case 9:
-      return "Đang chờ gia hạn";
-    case 101:
-      return "Chuẩn bị dừng hoạt động";
-    case 102:
-      return "Đã dừng hoạt động";
-    case 201:
-      return "Hoạt động";
-    case 202:
-      return "Không hoạt động";
-    default:
-      return "Không xác định";
-  }
+const getProfileGroup = (profile) => {
+  return profile ? profile.group : "";
 };
-
-const showAccountDisableReason = (statusID) => {
-  switch (statusID) {
-    case 0:
-      return "Vẫn đang chạy ngon";
-    case 1:
-      return "Vi phạm chính sách quảng cáo";
-    case 2:
-      return "Kiểm tra vi phạm IP";
-    case 3:
-      return "Vi phạm tài khoản thanh toán";
-    case 4:
-      return "Tài khoản đã dừng hoạt động";
-    case 5:
-      return "Đang review ads";
-    case 6:
-      return "Vi phạm do BM";
-    case 7:
-      return "Bị dừng vĩnh viễn";
-    case 8:
-      return "Đã dừng hoạt động";
-    case 9:
-      return "Tài khoản Reseller không được sử dụng";
-    case 10:
-      return "Tài khoản đã không được sử dụng";
-    default:
-      return "Không xác định";
-  }
+const getProfileLabel = (profile) => {
+  return profile ? profile.label : "";
 };
-
 const columns = [
-  { id: "name", label: "Tài khoản", minWidth: 100 },
-  { id: "group", label: "Nhóm", minWidth: 100 },
-  { id: "label", label: "Chú thích", minWidth: 100 },
+  { id: "username", label: "Tài khoản", minWidth: 100 },
+  { id: "profile", label: "Nhóm", minWidth: 100, format: getProfileGroup },
+  { id: "profile", label: "Chú thích", minWidth: 100, format: getProfileLabel },
   {
     id: "options",
     label: "Tùy chọn",
@@ -124,8 +75,8 @@ const useStyles = makeStyles({
 export default function UsersList() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  let isLoadingUsers = useSelector((state) => state.users.isLoadingUsers);
-  let searchParams = useSelector((state) => state.users.searchParams);
+  let isLoadingUsers = useSelector((state) => state.user.isLoadingUsers);
+  let searchParams = useSelector((state) => state.user.searchParams);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [listUsers, setListUsers] = React.useState([]);
@@ -149,6 +100,7 @@ export default function UsersList() {
       params: searchParams,
     })
       .then((resp) => {
+        console.log(resp.data);
         dispatch(setLoadUsersStatus(false));
         setListUsers(resp.data);
       })
@@ -157,6 +109,7 @@ export default function UsersList() {
         console.log(err);
       });
   };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -165,29 +118,18 @@ export default function UsersList() {
     setPage(0);
   };
   const handleClickOpenUsersDetails = (usersID) => {
-    dispatch(setUsersDetailID(usersID));
+    dispatch(setUserDetailId(usersID));
     dispatch(openDetailsDialog());
   };
   const handleClickDeleteUser = (usersID, username) => {
-    dispatch(setUserDeleteID(id));
+    dispatch(setUserDeleteId(usersID));
     dispatch(setUserDeleteName(username));
-    dispatch(openDeleteDialog());
+    dispatch(openUserDeleteDialog());
   };
-  const handleClickOpenUserResetPassword = (userId) => {
-    dispatch(setUserResetPasswordID(userId));
-    dispatch(openResetPasswordDialog());
-  };
-  const checkIfDanger = (status) => {
-    if (status == 2 || status == 101 || status == 102 || status == 202) {
-      return true;
-    }
-    return false;
-  };
-  const checkIfWarning = (status) => {
-    if (status == 3 || status == 7 || status == 8 || status == 9) {
-      return true;
-    }
-    return false;
+  const handleClickOpenUserResetPassword = (userId, username) => {
+    dispatch(setUserResetPasswordId(userId));
+    dispatch(setUserResetPasswordName(username));
+    dispatch(openUserResetPasswordDialog());
   };
   return (
     <React.Fragment>
@@ -218,7 +160,7 @@ export default function UsersList() {
                         if (colIndex == 3) {
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              <Tooltip title="Chi tiết" placement="top">
+                              {/* <Tooltip title="Chi tiết" placement="top">
                                 <IconButton
                                   className={classes.optionButton}
                                   aria-label="Chi tiết"
@@ -229,27 +171,32 @@ export default function UsersList() {
                                 >
                                   <EditIcon />
                                 </IconButton>
-                              </Tooltip>
+                              </Tooltip> */}
                               <Tooltip title="Reset mật khẩu" placement="top">
                                 <IconButton
                                   className={classes.optionButton}
                                   aria-label="Reset mật khẩu"
                                   color="primary"
                                   onClick={() =>
-                                    handleClickOpenUserResetPassword(row.id)
+                                    handleClickOpenUserResetPassword(
+                                      row.id,
+                                      row.username
+                                    )
                                   }
                                 >
                                   <LockOpenIcon />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip title="Reset mật khẩu" placement="top">
+                              <Tooltip title="Xoá tài khoản" placement="top">
                                 <IconButton
                                   className={classes.optionButton}
-                                  aria-label="Reset mật khẩu"
+                                  aria-label="Xóa tài khoản"
                                   color="primary"
-                                  onClick={() => handleClickDeleteUser(row.id)}
+                                  onClick={() =>
+                                    handleClickDeleteUser(row.id, row.username)
+                                  }
                                 >
-                                  <Delete />
+                                  <DeleteIcon />
                                 </IconButton>
                               </Tooltip>
                             </TableCell>
@@ -277,8 +224,7 @@ export default function UsersList() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      <UsersDetails />
-      {/* <UsersountVia /> */}
+      {/* <UsersDetails /> */}
     </React.Fragment>
   );
 }

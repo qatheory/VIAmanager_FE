@@ -6,6 +6,8 @@ import Via from "pages/Via/Via";
 import CreateVia from "pages/Via/CreateVia/CreateVia";
 import Bm from "pages/Bm/Bm";
 import AdsAccounts from "pages/AdsAccounts/AdsAccounts";
+import CreateUser from "pages/Users/CreateUser/CreateUser";
+import Users from "pages/Users/Users";
 import { useSelector } from "react-redux";
 import { selectDrawerStatus } from "store/reducers/viewSettings";
 import {
@@ -178,6 +180,8 @@ function AdminLayout(props) {
                 path="/admin/manage-via/create"
                 component={CreateVia}
               />
+              <Route exact path="/admin/users" component={Users} />
+              <Route exact path="/admin/users/create" component={CreateUser} />
             </Switch>
           </main>
         </Container>
