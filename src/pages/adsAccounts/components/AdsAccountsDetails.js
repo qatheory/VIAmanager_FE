@@ -92,7 +92,6 @@ export default function AdsAccountsDetails(props) {
 		const { formValues } = formState;
 
 		let header = Commons.header();
-		console.log(header);
 		let data = {
 			name: formValues.viaName,
 			fbid: formValues.viaFbid,
@@ -111,7 +110,6 @@ export default function AdsAccountsDetails(props) {
 		if (formValues.gender) {
 			data.gender = formValues.gender;
 		}
-		console.log(data);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/via/${adsAccID}/`,
 			method: "PUT",
@@ -120,7 +118,6 @@ export default function AdsAccountsDetails(props) {
 		})
 			.then((resp) => {
 				handleClose();
-				console.log(resp.data);
 			})
 			.catch((err) => {
 				handleClose();

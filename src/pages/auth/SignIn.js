@@ -17,115 +17,142 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
+	paper: {
+		marginTop: theme.spacing(8),
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "center",
+	},
+	avatar: {
+		margin: theme.spacing(1),
+		backgroundColor: theme.palette.secondary.main,
+	},
+	form: {
+		width: "100%", // Fix IE 11 issue.
+		marginTop: theme.spacing(1),
+	},
+	submit: {
+		margin: theme.spacing(3, 0, 2),
+	},
+	helper: {
+		"text-align": "center",
+		color: "red",
+	},
 }));
 
 export default function SignIn(props) {
-  const classes = useStyles();
-  const dispatch = useDispatch();
-  let [formUsername, setFormUsername] = React.useState("");
-  let [formPassword, setFormPassword] = React.useState("");
-  let [remember, setRemember] = React.useState(false);
-  const handleChangeUsername = (event) => {
-    setFormUsername(event.target.value);
-  };
-  const handleChangePassword = (event) => {
-    setFormPassword(event.target.value);
-  };
-  const handleChangeRemember = (event) => {
-    setRemember(event.target.value);
-  };
-  const handleLogin = (event) => {
-    event.preventDefault();
-    let userInfo = { username: formUsername, password: formPassword };
-    axios({
-      url: `${Constants.API_DOMAIN}/token-auth/`,
-      method: "POST",
-      data: userInfo,
-    }).then((res) => {
-      console.log(res);
-      if (res.data.token) {
-        if (remember) {
-          localStorage.setItem("token", res.data.token);
-        } else {
-          sessionStorage.setItem("token", res.data.token);
-        }
-        console.log(sessionStorage.getItem("token"));
-        dispatch(setLoggedIn());
-        dispatch(setUsername(res.data.user.username));
-        props.history.push("/admin/ads-accounts");
-      }
-    });
-  };
-  return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Đăng nhập
-        </Typography>
-        <form className={classes.form} onSubmit={handleLogin} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="Tài khoản"
-            name="username"
-            autoComplete="username"
-            value={formUsername}
-            onChange={handleChangeUsername}
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Mật khẩu"
-            type="password"
-            id="password"
-            value={formPassword}
-            onChange={handleChangePassword}
-            autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            value={remember}
-            onChange={handleChangeRemember}
-            className={classes.submit}
-          >
-            Đăng nhập
-          </Button>
-          {/* <Grid container>
+	const classes = useStyles();
+	const dispatch = useDispatch();
+	let [helperVisible, setHelperVisible] = React.useState(false);
+	let [formUsername, setFormUsername] = React.useState("");
+	let [formPassword, setFormPassword] = React.useState("");
+	let [remember, setRemember] = React.useState(false);
+	const handleChangeUsername = (event) => {
+		setFormUsername(event.target.value);
+	};
+	const handleChangePassword = (event) => {
+		setFormPassword(event.target.value);
+	};
+	const handleChangeRemember = (event) => {
+		setRemember(event.target.value);
+	};
+	const handleLogin = (event) => {
+		event.preventDefault();
+		let userInfo = { username: formUsername, password: formPassword };
+		axios({
+			url: `${Constants.API_DOMAIN}/token-auth/`,
+			method: "POST",
+			data: userInfo,
+		})
+			.then((res) => {
+				if (res.data.token) {
+					if (remember) {
+						localStorage.setItem("token", res.data.token);
+					} else {
+						sessionStorage.setItem("token", res.data.token);
+					}
+					dispatch(setLoggedIn());
+					dispatch(setUsername(res.data.user.username));
+					props.history.push("/admin/ads-accounts");
+				}
+			})
+			.catch((err) => {
+				if (err.response.status == 400) {
+					setHelperVisible(true);
+				}
+			});
+	};
+	const showHelper = () => {
+		if (helperVisible) {
+			return (
+				<div className={classes.helper}>
+					{"Tài khoản hoặc mật khẩu không chính xác"}
+				</div>
+			);
+		}
+		return "";
+	};
+	return (
+		<Container component="main" maxWidth="xs">
+			<CssBaseline />
+			<div className={classes.paper}>
+				<Avatar className={classes.avatar}>
+					<LockOutlinedIcon />
+				</Avatar>
+				<Typography component="h1" variant="h5">
+					Đăng nhập
+				</Typography>
+				<form
+					className={classes.form}
+					onSubmit={handleLogin}
+					noValidate
+				>
+					<TextField
+						variant="outlined"
+						margin="normal"
+						required
+						fullWidth
+						id="username"
+						label="Tài khoản"
+						name="username"
+						autoComplete="username"
+						value={formUsername}
+						onChange={handleChangeUsername}
+						autoFocus
+					/>
+					<TextField
+						variant="outlined"
+						margin="normal"
+						required
+						fullWidth
+						name="password"
+						label="Mật khẩu"
+						type="password"
+						id="password"
+						value={formPassword}
+						onChange={handleChangePassword}
+						autoComplete="current-password"
+					/>
+					<FormControlLabel
+						control={<Checkbox value="remember" color="primary" />}
+						label="Remember me"
+					/>
+					<Button
+						type="submit"
+						fullWidth
+						variant="contained"
+						color="primary"
+						value={remember}
+						onChange={handleChangeRemember}
+						className={classes.submit}
+					>
+						Đăng nhập
+					</Button>
+					{showHelper()}
+					{/* <div className={classes.helper}>
+						{"Tài khoản hoặc mật khẩu không chính xác"}
+					</div> */}
+					{/* <Grid container>
                         <Grid item xs>
                             <Link href="#" variant="body2">
                                 Forgot password?
@@ -137,8 +164,8 @@ export default function SignIn(props) {
                             </Link>
                         </Grid>
                     </Grid> */}
-        </form>
-      </div>
-    </Container>
-  );
+				</form>
+			</div>
+		</Container>
+	);
 }
