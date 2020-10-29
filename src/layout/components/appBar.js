@@ -196,7 +196,7 @@ function AppBarCustom(props) {
         </div> */}
 				<div className={classes.grow} />
 				<div className={classes.sectionDesktop}>
-					<IconButton aria-label="show 4 new mails" color="inherit">
+					{/* <IconButton aria-label="show 4 new mails" color="inherit">
 						<Badge badgeContent={4} color="secondary">
 							<MailIcon />
 						</Badge>
@@ -229,7 +229,7 @@ function AppBarCustom(props) {
 						color="inherit"
 					>
 						<MoreIcon />
-					</IconButton>
+					</IconButton> */}
 				</div>
 			</Toolbar>
 		</AppBar>

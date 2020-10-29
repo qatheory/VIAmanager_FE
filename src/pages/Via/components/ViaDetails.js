@@ -94,7 +94,6 @@ export default function ViaDetails(props) {
 		const { formValues } = formState;
 
 		let header = Commons.header();
-		console.log(header);
 		let data = {
 			name: formValues.viaName,
 			fbid: formValues.viaFbid,
@@ -113,7 +112,6 @@ export default function ViaDetails(props) {
 		if (formValues.gender) {
 			data.gender = formValues.gender;
 		}
-		console.log(data);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/via/${viaID}/`,
 			method: "PUT",
@@ -122,7 +120,6 @@ export default function ViaDetails(props) {
 		})
 			.then((resp) => {
 				handleClose();
-				console.log(resp.data);
 			})
 			.catch((err) => {
 				handleClose();

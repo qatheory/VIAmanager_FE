@@ -35,7 +35,6 @@ export default function ViaDetails(props) {
 
 	const handleSubmit = () => {
 		let header = Commons.header();
-		console.log(header);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/via/${viaDeleteID}/`,
 			method: "PUT",
