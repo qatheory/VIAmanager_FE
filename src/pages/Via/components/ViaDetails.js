@@ -95,22 +95,22 @@ export default function ViaDetails(props) {
 
 		let header = Commons.header();
 		let data = {
-			name: formValues.viaName,
-			fbid: formValues.viaFbid,
-			email: formValues.viaEmail,
-			emailPassword: formValues.viaEmailPassword,
-			password: formValues.viaPassword,
-			accessToken: formValues.viaAccessToken,
-			tfa: formValues.viaTFA,
-			fbLink: formValues.viaFbLink,
-			fbName: formValues.viaFbName,
-			label: formValues.viaLabel,
+			name: formValues.viaName.trim(),
+			fbid: formValues.viaFbid.trim(),
+			email: formValues.viaEmail.trim(),
+			emailPassword: formValues.viaEmailPassword.trim(),
+			password: formValues.viaPassword.trim(),
+			accessToken: formValues.viaAccessToken.trim(),
+			tfa: formValues.viaTFA.trim(),
+			fbLink: formValues.viaFbLink.trim(),
+			fbName: formValues.viaFbName.trim(),
+			label: formValues.viaLabel.trim(),
 		};
 		if (formValues.viaDob) {
-			data.dateOfBirth = formValues.viaDob;
+			data.dateOfBirth = formValues.viaDob.trim();
 		}
 		if (formValues.gender) {
-			data.gender = formValues.gender;
+			data.gender = formValues.gender.trim();
 		}
 		axios({
 			url: `${Constants.API_DOMAIN}/api/via/${viaID}/`,

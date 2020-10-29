@@ -58,7 +58,10 @@ export default function SignIn(props) {
 	};
 	const handleLogin = (event) => {
 		event.preventDefault();
-		let userInfo = { username: formUsername, password: formPassword };
+		let userInfo = {
+			username: formUsername.trim(),
+			password: formPassword.trim(),
+		};
 		axios({
 			url: `${Constants.API_DOMAIN}/token-auth/`,
 			method: "POST",
