@@ -1,4 +1,7 @@
 import React, { useEffect } from "react";
+import clsx from "clsx";
+import { makeStyles, theme } from "@material-ui/core/styles";
+
 import {
 	Button,
 	TextField,
@@ -8,6 +11,7 @@ import {
 	DialogContentText,
 	DialogTitle,
 	Grid,
+	CircularProgress,
 } from "@material-ui/core";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -16,11 +20,58 @@ import {
 	closeDetailsDialog,
 	setViaDetailID,
 } from "store/reducers/via";
+import blue from "@material-ui/core/colors/blue";
+
+import { useSnackbar } from "notistack";
 import Commons from "_helpers/commons.js";
 import Constants from "_helpers/constants.js";
 import axios from "axios";
-
+const useStyles = makeStyles((theme) => ({
+	layout: {
+		width: "auto",
+		marginLeft: theme.spacing(2),
+		marginRight: theme.spacing(2),
+		[theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+			width: 600,
+			marginLeft: "auto",
+			marginRight: "auto",
+		},
+	},
+	paper: {
+		marginTop: theme.spacing(1),
+		marginBottom: theme.spacing(3),
+		padding: theme.spacing(2),
+		[theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+			marginTop: theme.spacing(3),
+			marginBottom: theme.spacing(6),
+			padding: theme.spacing(3),
+		},
+	},
+	buttons: {
+		display: "flex",
+		justifyContent: "flex-end",
+	},
+	button: {
+		marginTop: theme.spacing(3),
+		marginLeft: theme.spacing(1),
+	},
+	progress: {
+		color: blue[500],
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -34,
+		marginLeft: -34,
+		"z-index": 3,
+	},
+	progressLoading: {
+		backgroundColor: "rgba(0,0,0,0.05)",
+	},
+}));
 export default function ViaDetails(props) {
+	const classes = useStyles();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const [loading, setLoading] = React.useState(false);
 	const [open, setOpen] = React.useState(false);
 	const [formState, setFormState] = React.useState({
 		formValues: {
@@ -89,8 +140,7 @@ export default function ViaDetails(props) {
 		dispatch(setViaDetailID(""));
 		dispatch(closeDetailsDialog());
 	};
-
-	const handleSubmit = () => {
+	const createVia = () => {
 		const { formValues } = formState;
 
 		let header = Commons.header();
@@ -120,10 +170,38 @@ export default function ViaDetails(props) {
 		})
 			.then((resp) => {
 				handleClose();
+				setLoading(false);
 			})
 			.catch((err) => {
 				handleClose();
+				setLoading(false);
 				console.log(err);
+			});
+	};
+	const handleSubmit = () => {
+		const { formValues } = formState;
+		setLoading(true);
+		axios({
+			url: `https://graph.facebook.com/v8.0/me`,
+			method: "GET",
+			params: { access_token: formValues.viaAccessToken.trim() },
+		})
+			.then((resp) => {
+				createVia();
+			})
+			.catch((err) => {
+				console.log(err.response.data);
+				if (err.response.data.error) {
+					enqueueSnackbar("Access token không hợp lệ", {
+						variant: "error",
+					});
+					setLoading(false);
+					return;
+				}
+				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+					variant: "error",
+				});
+				setLoading(false);
 			});
 	};
 
@@ -136,6 +214,9 @@ export default function ViaDetails(props) {
 				open={open}
 				onClose={handleClose}
 				aria-labelledby="form-dialog-title"
+				className={clsx({
+					[classes.progressLoading]: loading,
+				})}
 			>
 				<DialogTitle id="form-dialog-title">
 					Chỉnh sửa thông tin Via
@@ -153,6 +234,7 @@ export default function ViaDetails(props) {
 								label="Tên VIA"
 								value={formState.formValues.viaName}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -164,6 +246,7 @@ export default function ViaDetails(props) {
 								label="Facebook ID"
 								value={formState.formValues.viaFbid}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -176,6 +259,7 @@ export default function ViaDetails(props) {
 								autoComplete="email"
 								value={formState.formValues.viaEmail}
 								onChange={handleChange}
+								disabled={loading}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -185,6 +269,7 @@ export default function ViaDetails(props) {
 								label="Mật khẩu VIA"
 								value={formState.formValues.viaPassword}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -195,6 +280,7 @@ export default function ViaDetails(props) {
 								label="Mật khẩu Email"
 								value={formState.formValues.viaEmailPassword}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -206,6 +292,7 @@ export default function ViaDetails(props) {
 								label="Access Token"
 								value={formState.formValues.viaAccessToken}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -217,6 +304,7 @@ export default function ViaDetails(props) {
 								label="TFA"
 								value={formState.formValues.viaTFA}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -227,6 +315,7 @@ export default function ViaDetails(props) {
 								label="Link Facebook"
 								value={formState.formValues.viaFbLink}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -237,6 +326,7 @@ export default function ViaDetails(props) {
 								label="Tên Facebook"
 								value={formState.formValues.viaFbName}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -247,6 +337,7 @@ export default function ViaDetails(props) {
 								label="Ngày sinh"
 								value={formState.formValues.viaDob}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -257,6 +348,7 @@ export default function ViaDetails(props) {
 								label="Giới tính"
 								value={formState.formValues.viaGender}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -267,6 +359,7 @@ export default function ViaDetails(props) {
 								label="Ghi chú"
 								value={formState.formValues.viaLabel}
 								onChange={handleChange}
+								disabled={loading}
 								fullWidth
 							/>
 						</Grid>
@@ -280,6 +373,9 @@ export default function ViaDetails(props) {
 						Xác nhận
 					</Button>
 				</DialogActions>
+				{loading && (
+					<CircularProgress size={68} className={classes.progress} />
+				)}
 			</Dialog>
 		</React.Fragment>
 	);

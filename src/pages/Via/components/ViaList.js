@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import Commons from "_helpers/commons.js";
@@ -13,6 +14,7 @@ import {
 	TablePagination,
 	IconButton,
 	Tooltip,
+	LinearProgress,
 } from "@material-ui/core";
 import {
 	toggleDetailsDialog,
@@ -26,6 +28,9 @@ import {
 	setViaLoginInfo,
 	setViaDeleteID,
 } from "store/reducers/via";
+import { useSnackbar } from "notistack";
+import blue from "@material-ui/core/colors/blue";
+
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import HowToRegIcon from "@material-ui/icons/HowToReg";
@@ -67,10 +72,34 @@ const useStyles = makeStyles((theme) => ({
 		padding: "0px",
 		"margin-left": "12px",
 	},
+
+	loadingRow: {
+		height: "4px",
+	},
+	loadingCell: {
+		padding: "0px",
+	},
+	tableHeaderCell: { "border-bottom": "0px !important" },
+	progress: {
+		color: blue[500],
+		position: "relative",
+		// top: "0%",
+		width: "100%",
+		// left: "50%",
+		// marginTop: -34,
+		// marginLeft: -34,
+		"z-index": 3,
+	},
+	progressLoading: {
+		backgroundColor: "rgba(0,0,0,0.05)",
+	},
 }));
 
 export default function VIAList() {
 	const classes = useStyles();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const [loading, setLoading] = React.useState(false);
+
 	const dispatch = useDispatch();
 	let isLoadingVias = useSelector((state) => state.via.isLoadingVias);
 	let searchParams = useSelector((state) => state.via.searchParams);
@@ -90,6 +119,7 @@ export default function VIAList() {
 
 	const getViasList = () => {
 		let header = Commons.header();
+		setLoading(true);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/vias/`,
 			method: "GET",
@@ -97,12 +127,18 @@ export default function VIAList() {
 			params: searchParams,
 		})
 			.then((resp) => {
+				console.log(resp);
 				dispatch(setLoadViasStatus(false));
 				setListVias(resp.data);
+				setLoading(false);
 			})
 			.catch((err) => {
 				dispatch(setLoadViasStatus(false));
 				console.log(err);
+				setLoading(false);
+				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+					variant: "error",
+				});
 			});
 	};
 	const handleChangePage = (event, newPage) => {
@@ -135,6 +171,7 @@ export default function VIAList() {
 							<TableRow>
 								{columns.map((column) => (
 									<TableCell
+										className={classes.tableHeaderCell}
 										key={column.id}
 										align={column.align}
 										style={{ minWidth: column.minWidth }}
@@ -143,8 +180,24 @@ export default function VIAList() {
 									</TableCell>
 								))}
 							</TableRow>
+							<TableRow className={classes.loadingRow}>
+								<TableCell
+									className={classes.loadingCell}
+									colSpan={columns.length}
+								>
+									{loading && (
+										<LinearProgress
+											className={classes.progress}
+										/>
+									)}
+								</TableCell>
+							</TableRow>
 						</TableHead>
-						<TableBody>
+						<TableBody
+							className={clsx({
+								[classes.progressLoading]: loading,
+							})}
+						>
 							{listVias
 								.slice(
 									page * rowsPerPage,
@@ -198,6 +251,9 @@ export default function VIAList() {
 																	}
 																	aria-label="Thông tin đăng nhập"
 																	color="primary"
+																	disabled={
+																		loading
+																	}
 																	onClick={() =>
 																		handleClickOpenViaLogin(
 																			row.name,
@@ -220,6 +276,9 @@ export default function VIAList() {
 																	}
 																	aria-label="Chi tiết"
 																	color="primary"
+																	disabled={
+																		loading
+																	}
 																	onClick={() =>
 																		handleClickOpenViaDetails(
 																			row.id
@@ -238,6 +297,9 @@ export default function VIAList() {
 																		classes.optionButton
 																	}
 																	aria-label="Xóa"
+																	disabled={
+																		loading
+																	}
 																	onClick={() =>
 																		handleClickOpenViaDelete(
 																			row.id,

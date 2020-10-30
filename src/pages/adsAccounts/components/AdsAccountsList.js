@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import clsx from "clsx";
+
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import Commons from "_helpers/commons.js";
@@ -13,6 +15,7 @@ import {
 	TablePagination,
 	Tooltip,
 	IconButton,
+	LinearProgress,
 } from "@material-ui/core";
 import { red, amber } from "@material-ui/core/colors";
 import {
@@ -24,7 +27,9 @@ import {
 	setAdsAccOwnersId,
 	setAdsAccOwnersName,
 } from "store/reducers/adsAcc";
-import clsx from "clsx";
+import { useSnackbar } from "notistack";
+import blue from "@material-ui/core/colors/blue";
+
 import AdsAccountsDetails from "pages/AdsAccounts/components/AdsAccountsDetails";
 // import AdsAccountVia from "pages/AdsAccounts/components/AdsAccountVia";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -139,10 +144,33 @@ const useStyles = makeStyles({
 	rowWarning: {
 		background: amber[50],
 	},
+	loadingRow: {
+		height: "4px",
+	},
+	loadingCell: {
+		padding: "0px",
+	},
+	tableHeaderCell: { "border-bottom": "0px !important" },
+	progress: {
+		color: blue[500],
+		position: "relative",
+		// top: "0%",
+		width: "100%",
+		// left: "50%",
+		// marginTop: -34,
+		// marginLeft: -34,
+		"z-index": 3,
+	},
+	progressLoading: {
+		backgroundColor: "rgba(0,0,0,0.05)",
+	},
 });
 
 export default function AdsAccountsList() {
 	const classes = useStyles();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const [loading, setLoading] = React.useState(false);
+
 	const dispatch = useDispatch();
 	let isLoadingAdsAcc = useSelector((state) => state.adsAcc.isLoadingAdsAcc);
 	let selectedVia = useSelector((state) => state.adsAcc.selectedVia);
@@ -164,6 +192,7 @@ export default function AdsAccountsList() {
 
 	const getAdsAccList = () => {
 		let header = Commons.header();
+		setLoading(true);
 		axios({
 			url: `${Constants.API_DOMAIN}/api/ads_acc/`,
 			method: "GET",
@@ -171,17 +200,40 @@ export default function AdsAccountsList() {
 			params: { via: selectedVia, status: selectedStatus },
 		})
 			.then((resp) => {
-				let adsAccounts = resp.data.map((adsAcc) => {
+				console.log(resp);
+				let adsAccounts = resp.data.data.map((adsAcc) => {
 					return adsAcc.business
 						? { ...adsAcc, businessName: adsAcc.business.name }
 						: adsAcc;
 				});
+				if (resp.data.error.viaError.length != 0) {
+					enqueueSnackbar(
+						`Xảy ra lỗi với Via: ${resp.data.error.viaError.join(
+							", "
+						)}`,
+						{
+							variant: "error",
+						}
+					);
+				}
 				dispatch(setLoadAdsAccStatus(false));
 				setListAdsAccounts(adsAccounts);
+				setLoading(false);
 			})
 			.catch((err) => {
 				dispatch(setLoadAdsAccStatus(false));
-				console.log(err);
+				console.log(err.response.data);
+				if (err.response.data.error) {
+					enqueueSnackbar("Access token không hợp lệ", {
+						variant: "error",
+					});
+					setLoading(false);
+					return;
+				}
+				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+					variant: "error",
+				});
+				setLoading(false);
 			});
 	};
 	const handleChangePage = (event, newPage) => {
@@ -222,6 +274,7 @@ export default function AdsAccountsList() {
 							<TableRow>
 								{columns.map((column) => (
 									<TableCell
+										className={classes.tableHeaderCell}
 										key={column.id}
 										align={column.align}
 										style={{ minWidth: column.minWidth }}
@@ -229,6 +282,18 @@ export default function AdsAccountsList() {
 										{column.label}
 									</TableCell>
 								))}
+							</TableRow>
+							<TableRow className={classes.loadingRow}>
+								<TableCell
+									className={classes.loadingCell}
+									colSpan={columns.length}
+								>
+									{loading && (
+										<LinearProgress
+											className={classes.progress}
+										/>
+									)}
+								</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -283,6 +348,9 @@ export default function AdsAccountsList() {
 																	}
 																	aria-label="Via sở hữu"
 																	color="primary"
+																	disabled={
+																		loading
+																	}
 																	onClick={() =>
 																		handleClickOpenAdsAccOwners(
 																			row.owner,

@@ -11,6 +11,7 @@
     "@testing-library/user-event": "^7.2.1",
     "authenticator": "^1.1.5",
     "axios": "^0.20.0",
+    "notistack": "^1.0.1",
     "otplib": "^12.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

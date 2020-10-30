@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { makeStyles, theme } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -10,7 +11,12 @@ import {
 	FormControlLabel,
 	Checkbox,
 	Button,
+	CircularProgress,
 } from "@material-ui/core";
+import blue from "@material-ui/core/colors/blue";
+
+import { useSnackbar } from "notistack";
+
 import axios from "axios";
 import Constants from "_helpers/constants.js";
 import Commons from "_helpers/commons.js";
@@ -51,9 +57,23 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: theme.spacing(3),
 		marginLeft: theme.spacing(1),
 	},
+	progress: {
+		color: blue[500],
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -34,
+		marginLeft: -34,
+		"z-index": 3,
+	},
+	progressLoading: {
+		backgroundColor: "rgba(0,0,0,0.05)",
+	},
 }));
 function CreateVIA(props) {
 	const classes = useStyles();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const [loading, setLoading] = React.useState(false);
 	const [formState, setFormState] = React.useState({
 		formValues: {
 			viaName: "",
@@ -79,9 +99,8 @@ function CreateVIA(props) {
 	const handleCancel = () => {
 		props.history.push("/admin/manage-via");
 	};
-	const handleSubmit = () => {
+	const createVia = () => {
 		const { formValues } = formState;
-
 		let header = Commons.header();
 		let data = {
 			name: formValues.viaName.trim(),
@@ -109,19 +128,52 @@ function CreateVIA(props) {
 			data: data,
 		})
 			.then((resp) => {
+				setLoading(false);
 				props.history.push("/admin/manage-via");
 				// console.log(resp.data);
 			})
 			.catch((err) => {
+				setLoading(false);
 				props.history.push("/admin/manage-via");
 				console.log(err);
+			});
+	};
+	const handleSubmit = () => {
+		const { formValues } = formState;
+		setLoading(true);
+		axios({
+			url: `https://graph.facebook.com/v8.0/me`,
+			method: "GET",
+			params: { access_token: formValues.viaAccessToken.trim() },
+		})
+			.then((resp) => {
+				createVia();
+			})
+			.catch((err) => {
+				console.log(err.response.data);
+				if (err.response.data.error) {
+					enqueueSnackbar("Access token không hợp lệ", {
+						variant: "error",
+					});
+					setLoading(false);
+					return;
+				}
+				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+					variant: "error",
+				});
+				setLoading(false);
 			});
 	};
 	return (
 		<div>
 			<Fade in={true}>
 				<div className={classes.layout}>
-					<Paper className={classes.paper}>
+					<Paper
+						className={clsx({
+							[classes.paper]: true,
+							[classes.progressLoading]: loading,
+						})}
+					>
 						<Typography variant="h6" gutterBottom>
 							Thêm VIA mới
 						</Typography>
@@ -133,6 +185,7 @@ function CreateVIA(props) {
 									label="Tên VIA"
 									value={formState.formValues.viaName}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -144,6 +197,7 @@ function CreateVIA(props) {
 									label="Facebook ID"
 									value={formState.formValues.viaFbid}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -156,6 +210,7 @@ function CreateVIA(props) {
 									autoComplete="email"
 									value={formState.formValues.viaEmail}
 									onChange={handleChange}
+									disabled={loading}
 								/>
 							</Grid>
 							<Grid item xs={12} sm={6}>
@@ -165,6 +220,7 @@ function CreateVIA(props) {
 									label="Mật khẩu VIA"
 									value={formState.formValues.viaPassword}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -177,6 +233,7 @@ function CreateVIA(props) {
 										formState.formValues.viaEmailPassword
 									}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -188,6 +245,7 @@ function CreateVIA(props) {
 									label="Access Token"
 									value={formState.formValues.viaAccessToken}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -199,6 +257,7 @@ function CreateVIA(props) {
 									label="TFA"
 									value={formState.formValues.viaTFA}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -209,6 +268,7 @@ function CreateVIA(props) {
 									label="Link Facebook"
 									value={formState.formValues.viaFbLink}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -219,6 +279,7 @@ function CreateVIA(props) {
 									label="Tên Facebook"
 									value={formState.formValues.viaFbName}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -229,6 +290,7 @@ function CreateVIA(props) {
 									label="Ngày sinh"
 									value={formState.formValues.viaDob}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -239,6 +301,7 @@ function CreateVIA(props) {
 									label="Giới tính"
 									value={formState.formValues.viaGender}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -249,6 +312,7 @@ function CreateVIA(props) {
 									label="Ghi chú"
 									value={formState.formValues.viaLabel}
 									onChange={handleChange}
+									disabled={loading}
 									fullWidth
 								/>
 							</Grid>
@@ -259,6 +323,7 @@ function CreateVIA(props) {
 								color="secondary"
 								onClick={handleCancel}
 								className={classes.button}
+								disabled={loading}
 							>
 								Thoát
 							</Button>
@@ -268,11 +333,18 @@ function CreateVIA(props) {
 								color="primary"
 								onClick={handleSubmit}
 								className={classes.button}
+								disabled={loading}
 							>
 								Tạo VIA
 							</Button>
 						</div>
 					</Paper>
+					{loading && (
+						<CircularProgress
+							size={68}
+							className={classes.progress}
+						/>
+					)}
 				</div>
 			</Fade>
 		</div>
