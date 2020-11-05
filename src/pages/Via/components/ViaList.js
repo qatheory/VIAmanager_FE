@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import Commons from "_helpers/commons.js";
+import ViasServices from "_services/vias.js";
 import {
 	Paper,
 	Table,
@@ -34,7 +35,7 @@ import blue from "@material-ui/core/colors/blue";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import HowToRegIcon from "@material-ui/icons/HowToReg";
-
+import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import axios from "axios";
 import Constants from "_helpers/localConstants.js";
 const columns = [
@@ -161,7 +162,27 @@ export default function VIAList() {
 		dispatch(setViaLoginInfo({ name, email, password, tfa }));
 		dispatch(openLoginDialog());
 	};
-
+	const handleClickCheckVia = async (id) => {
+		setLoading(true);
+		let viaStatus = await ViasServices.checkVia(id);
+		console.log(viaStatus);
+		if (viaStatus.success) {
+			if (viaStatus.status) {
+				enqueueSnackbar(viaStatus.messages, {
+					variant: "success",
+				});
+			} else {
+				enqueueSnackbar(viaStatus.messages, {
+					variant: "warning",
+				});
+			}
+		} else {
+			enqueueSnackbar(viaStatus.messages, {
+				variant: "error",
+			});
+		}
+		setLoading(false);
+	};
 	return (
 		<React.Fragment>
 			<Paper variant="outlined" className={classes.root}>
@@ -241,6 +262,28 @@ export default function VIAList() {
 															key={column.id}
 															align={column.align}
 														>
+															<Tooltip
+																title="Kiểm tra Via"
+																placement="top"
+															>
+																<IconButton
+																	className={
+																		classes.optionButton
+																	}
+																	aria-label="Tài khoản ads"
+																	color="primary"
+																	disabled={
+																		loading
+																	}
+																	onClick={() =>
+																		handleClickCheckVia(
+																			row.id
+																		)
+																	}
+																>
+																	<AssignmentTurnedInIcon />
+																</IconButton>
+															</Tooltip>
 															<Tooltip
 																title="Thông tin đăng nhập"
 																placement="top"

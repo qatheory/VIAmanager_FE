@@ -108,16 +108,16 @@ const columns = [
 		minWidth: 170,
 		format: showAccountDisableReason,
 	},
-	{
-		id: "amount_spent",
-		label: "Số tiền đã tiêu",
-		align: "right",
-	},
-	{
-		id: "balance",
-		label: "Hóa đơn",
-		align: "right",
-	},
+	// {
+	// 	id: "amount_spent",
+	// 	label: "Số tiền đã tiêu",
+	// 	align: "right",
+	// },
+	// {
+	// 	id: "balance",
+	// 	label: "Hóa đơn",
+	// 	align: "right",
+	// },
 	{
 		id: "options",
 		label: "Tùy chọn",
@@ -320,24 +320,24 @@ export default function AdsAccountsList() {
 										>
 											{columns.map((column, colIndex) => {
 												const value = row[column.id];
-												if (colIndex == 6) {
+												if (colIndex == 4) {
 													return (
 														<TableCell
 															key={column.id}
 															align={column.align}
 														>
 															{/* <Tooltip title="Chi tiết" placement="top">
-                                <IconButton
-                                  className={classes.optionButton}
-                                  aria-label="Chi tiết"
-                                  color="primary"
-                                  onClick={() =>
-                                    handleClickOpenAdsAccDetails(row.id)
-                                  }
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                              </Tooltip> */}
+																<IconButton
+																className={classes.optionButton}
+																aria-label="Chi tiết"
+																color="primary"
+																onClick={() =>
+																	handleClickOpenAdsAccDetails(row.id)
+																}
+																>
+																<EditIcon />
+																</IconButton>
+															</Tooltip> */}
 															<Tooltip
 																title="Via sở hữu"
 																placement="top"

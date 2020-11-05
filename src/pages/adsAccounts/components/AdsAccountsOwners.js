@@ -89,7 +89,7 @@ export default function AdsAccountsOwners(props) {
 		dispatch(setAdsAccOwnersId([]));
 		dispatch(setAdsAccOwnersName(""));
 		dispatch(closeAdsAccOwnersDialog());
-		adsAccOwnersInfo([]);
+		setAdsAccOwnersInfo([]);
 	};
 
 	return (

@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+
 import {
 	Button,
 	TextField,
@@ -13,7 +15,10 @@ import {
 	TableRow,
 	TableCell,
 	TableBody,
+	LinearProgress,
 } from "@material-ui/core";
+import { red, amber } from "@material-ui/core/colors";
+import blue from "@material-ui/core/colors/blue";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -98,17 +103,44 @@ const columns = [
 		format: showAccountDisableReason,
 	},
 ];
+const useStyles = makeStyles({
+	rowDanger: {
+		background: red[50],
+	},
+	loadingRow: {
+		height: "4px",
+	},
+	loadingCell: {
+		padding: "0px",
+	},
+	tableHeaderCell: { "border-bottom": "0px !important" },
+	progress: {
+		color: blue[500],
+		position: "relative",
+		// top: "0%",
+		width: "100%",
+		// left: "50%",
+		// marginTop: -34,
+		// marginLeft: -34,
+		"z-index": 3,
+	},
+	progressLoading: {
+		backgroundColor: "rgba(0,0,0,0.05)",
+	},
+});
 
 export default function BmAdsAcc(props) {
 	let dispatch = useDispatch();
 	const [bmAdsAccList, setBmAdsAccList] = React.useState([]);
-
+	const [loading, setLoading] = React.useState(false);
+	const classes = useStyles();
 	let bmAdsAccStatus = useSelector((state) => state.bm.adsAccOwnedDialog);
 	let bmAdsAccId = useSelector((state) => state.bm.AdsAccOwnedId);
 	let bmAdsAccName = useSelector((state) => state.bm.AdsAccOwnedName);
 	let bmAdsAccOwnedVia = useSelector((state) => state.bm.AdsAccOwnedVia);
 	useEffect(() => {
 		if (bmAdsAccId != "") {
+			setLoading(true);
 			let header = Commons.header();
 			axios({
 				url: `${Constants.API_DOMAIN}/api/bms/ads_acc/`,
@@ -126,9 +158,11 @@ export default function BmAdsAcc(props) {
 						};
 					});
 					setBmAdsAccList(AdsAccList);
+					setLoading(false);
 				})
 				.catch((err) => {
 					console.log(err);
+					setLoading(false);
 				});
 		}
 	}, [bmAdsAccId]);
@@ -141,7 +175,7 @@ export default function BmAdsAcc(props) {
 		dispatch(setAdsAccOwnedName(""));
 		dispatch(setAdsAccOwnedVia(""));
 		dispatch(closeAdsAccOwnedDialog());
-		bmAdsAccList([]);
+		setBmAdsAccList([]);
 	};
 
 	return (
@@ -164,6 +198,7 @@ export default function BmAdsAcc(props) {
 								<TableRow>
 									{columns.map((column) => (
 										<TableCell
+											className={classes.tableHeaderCell}
 											key={column.id}
 											align={column.align}
 											style={{
@@ -173,6 +208,18 @@ export default function BmAdsAcc(props) {
 											{column.label}
 										</TableCell>
 									))}
+								</TableRow>
+								<TableRow className={classes.loadingRow}>
+									<TableCell
+										className={classes.loadingCell}
+										colSpan={columns.length}
+									>
+										{loading && (
+											<LinearProgress
+												className={classes.progress}
+											/>
+										)}
+									</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
