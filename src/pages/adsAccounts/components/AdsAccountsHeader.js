@@ -19,7 +19,7 @@ import ListAltIcon from "@material-ui/icons/ListAlt";
 import { Link } from "react-router-dom";
 import Commons from "_helpers/commons.js";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 import {
 	setLoadAdsAccStatus,
 	setSelectedVia,

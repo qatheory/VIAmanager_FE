@@ -24,7 +24,7 @@ import blue from "@material-ui/core/colors/blue";
 
 import { useSnackbar } from "notistack";
 import Commons from "_helpers/commons.js";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 import axios from "axios";
 const useStyles = makeStyles((theme) => ({
 	layout: {

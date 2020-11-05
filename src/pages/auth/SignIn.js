@@ -15,7 +15,7 @@ import Container from "@material-ui/core/Container";
 import { setLoggedIn, setUsername } from "store/reducers/viewSettings";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 const useStyles = makeStyles((theme) => ({
 	paper: {
 		marginTop: theme.spacing(8),

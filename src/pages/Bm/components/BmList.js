@@ -34,7 +34,7 @@ import blue from "@material-ui/core/colors/blue";
 import LocalActivityIcon from "@material-ui/icons/LocalActivity";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 const convertVerificationStatus = (status) => {
 	switch (status) {
 		case "verified":

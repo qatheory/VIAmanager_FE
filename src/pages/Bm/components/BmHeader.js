@@ -25,7 +25,7 @@ import {
 } from "store/reducers/bm";
 import Commons from "_helpers/commons.js";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 const useStyles = makeStyles((theme) => ({
 	card__header__item: {
 		margin: theme.spacing(1, 1),

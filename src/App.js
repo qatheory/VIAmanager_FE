@@ -16,7 +16,7 @@ import {
 	setLoggedOut,
 } from "store/reducers/viewSettings";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 import Commons from "_helpers/commons.js";
 
 function PrivateRoute({ component: Component, authed, ...rest }) {

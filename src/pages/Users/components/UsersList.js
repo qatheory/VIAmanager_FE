@@ -33,7 +33,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 const getProfileGroup = (profile) => {
 	return profile ? profile.group : "";
 };

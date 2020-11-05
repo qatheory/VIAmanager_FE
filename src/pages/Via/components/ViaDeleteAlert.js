@@ -18,7 +18,7 @@ import {
 	setLoadViasStatus,
 } from "store/reducers/via";
 import Commons from "_helpers/commons.js";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 import axios from "axios";
 
 export default function ViaDetails(props) {

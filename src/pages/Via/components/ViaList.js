@@ -36,7 +36,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import HowToRegIcon from "@material-ui/icons/HowToReg";
 
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 const columns = [
 	{ id: "name", label: "VIA", minWidth: 100 },
 	{ id: "email", label: "Email", minWidth: 170 },

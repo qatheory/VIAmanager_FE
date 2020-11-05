@@ -36,7 +36,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 const showAccountStatus = (statusID) => {
 	switch (statusID) {
 		case 1:

@@ -12,7 +12,7 @@ import {
 	Button,
 } from "@material-ui/core";
 import axios from "axios";
-import Constants from "_helpers/constants.js";
+import Constants from "_helpers/localConstants.js";
 import Commons from "_helpers/commons.js";
 import { FlashOnRounded } from "@material-ui/icons";
 
