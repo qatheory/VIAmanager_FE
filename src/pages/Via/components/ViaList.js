@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
+
 import { useSelector, useDispatch } from "react-redux";
 import Commons from "_helpers/commons.js";
 import ViasServices from "_services/vias.js";
@@ -17,6 +18,8 @@ import {
 	Tooltip,
 	LinearProgress,
 } from "@material-ui/core";
+import { red, amber } from "@material-ui/core/colors";
+
 import {
 	toggleDetailsDialog,
 	openDetailsDialog,
@@ -38,6 +41,18 @@ import HowToRegIcon from "@material-ui/icons/HowToReg";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import axios from "axios";
 import Constants from "_helpers/localConstants.js";
+const convertViaStatus = (status) => {
+	switch (status) {
+		case 0:
+			return "Dừng hoạt động";
+		case 1:
+			return "Đang hoạt động";
+		case null:
+			return "Chưa xác định";
+		default:
+			return "Chưa xác định";
+	}
+};
 const columns = [
 	{ id: "name", label: "VIA", minWidth: 100 },
 	{ id: "email", label: "Email", minWidth: 170 },
@@ -46,6 +61,7 @@ const columns = [
 		id: "status",
 		label: "Trạng thái",
 		align: "right",
+		format: convertViaStatus,
 	},
 	{
 		id: "tfa",
@@ -73,7 +89,12 @@ const useStyles = makeStyles((theme) => ({
 		padding: "0px",
 		"margin-left": "12px",
 	},
-
+	rowDanger: {
+		background: red[50],
+	},
+	rowWarning: {
+		background: amber[50],
+	},
 	loadingRow: {
 		height: "4px",
 	},
@@ -167,11 +188,11 @@ export default function VIAList() {
 		let viaStatus = await ViasServices.checkVia(id);
 		console.log(viaStatus);
 		if (viaStatus.success) {
-			if (viaStatus.status) {
+			if (viaStatus.status == true) {
 				enqueueSnackbar(viaStatus.messages, {
 					variant: "success",
 				});
-			} else {
+			} else if (viaStatus.status == false) {
 				enqueueSnackbar(viaStatus.messages, {
 					variant: "warning",
 				});
@@ -182,6 +203,12 @@ export default function VIAList() {
 			});
 		}
 		setLoading(false);
+	};
+	const checkIfDanger = (status) => {
+		return status == 0 ? true : false;
+	};
+	const checkIfWarning = (status) => {
+		return status == null || status == 2 ? true : false;
 	};
 	return (
 		<React.Fragment>
@@ -227,6 +254,14 @@ export default function VIAList() {
 								.map((row) => {
 									return (
 										<TableRow
+											className={clsx({
+												[classes.rowDanger]: checkIfDanger(
+													row.status
+												),
+												[classes.rowWarning]: checkIfWarning(
+													row.status
+												),
+											})}
 											hover
 											role="checkbox"
 											tabIndex={-1}
@@ -234,18 +269,18 @@ export default function VIAList() {
 										>
 											{columns.map((column, colIndex) => {
 												const value = row[column.id];
-												if (colIndex == 3) {
-													return (
-														<TableCell
-															key={column.id}
-															align={column.align}
-														>
-															{value == 1
-																? "Đang hoạt động"
-																: "Dừng hoạt động"}
-														</TableCell>
-													);
-												}
+												// if (colIndex == 3) {
+												// 	return (
+												// 		<TableCell
+												// 			key={column.id}
+												// 			align={column.align}
+												// 		>
+												// 			{convertViaStatus(
+												// 				value
+												// 			)}
+												// 		</TableCell>
+												// 	);
+												// }
 												// if (colIndex == 4) {
 												// 	return (
 												// 		<TableCell
