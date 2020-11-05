@@ -1,3 +1,3 @@
 export default {
-	API_DOMAIN: "http://localhost:8000",
+	API_DOMAIN: "http://192.168.1.40:8000",
 };
