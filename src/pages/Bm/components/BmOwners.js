@@ -86,6 +86,7 @@ export default function BmOwners(props) {
     dispatch(setBmOwnersId([]));
     dispatch(setBmOwnersName(""));
     dispatch(closeBmOwnersDialog());
+    setBmOwnersInfo([])
   };
 
   return (
