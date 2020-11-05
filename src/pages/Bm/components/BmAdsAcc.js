@@ -141,6 +141,7 @@ export default function BmAdsAcc(props) {
 		dispatch(setAdsAccOwnedName(""));
 		dispatch(setAdsAccOwnedVia(""));
 		dispatch(closeAdsAccOwnedDialog());
+		bmAdsAccList([]);
 	};
 
 	return (
