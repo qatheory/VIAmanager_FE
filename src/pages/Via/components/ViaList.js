@@ -302,6 +302,7 @@ export default function VIAList() {
 																placement="top"
 															>
 																<IconButton
+																	component="div"
 																	className={
 																		classes.optionButton
 																	}
@@ -324,6 +325,7 @@ export default function VIAList() {
 																placement="top"
 															>
 																<IconButton
+																	component="div"
 																	className={
 																		classes.optionButton
 																	}
@@ -349,6 +351,7 @@ export default function VIAList() {
 																placement="top"
 															>
 																<IconButton
+																	component="div"
 																	className={
 																		classes.optionButton
 																	}
@@ -371,6 +374,7 @@ export default function VIAList() {
 																placement="top"
 															>
 																<IconButton
+																	component="div"
 																	className={
 																		classes.optionButton
 																	}

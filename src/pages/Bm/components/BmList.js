@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { red, amber } from "@material-ui/core/colors";
-
+import * as moment from "moment";
 import Commons from "_helpers/commons.js";
 import {
 	Paper,
@@ -33,8 +33,18 @@ import { useSnackbar } from "notistack";
 import blue from "@material-ui/core/colors/blue";
 import LocalActivityIcon from "@material-ui/icons/LocalActivity";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import SaveIcon from "@material-ui/icons/Save";
 import axios from "axios";
+import copy from "copy-to-clipboard";
+import BmsServices from "_services/bms.js";
+
 import Constants from "_helpers/localConstants.js";
+const formatDate = (expirationDate) => {
+	if (expirationDate == "") {
+		return "";
+	}
+	return moment(expirationDate).format("DD-MM-YYYY");
+};
 const convertVerificationStatus = (status) => {
 	switch (status) {
 		case "verified":
@@ -55,6 +65,22 @@ const columns = [
 		format: convertVerificationStatus,
 	},
 	{
+		id: "backup_email",
+		label: "Email backup",
+		align: "right",
+	},
+	{
+		id: "backup_link",
+		label: "Link backup",
+		align: "right",
+	},
+	{
+		id: "expiration_date",
+		label: "Ngày hết hạn",
+		align: "right",
+		format: formatDate,
+	},
+	{
 		id: "options",
 		label: "Tùy chọn",
 		minWidth: 170,
@@ -73,6 +99,9 @@ const useStyles = makeStyles({
 	optionButton: {
 		padding: "0px",
 		"margin-left": "12px",
+	},
+	backupLink: {
+		cursor: "copy",
 	},
 	rowDanger: {
 		background: red[50],
@@ -146,7 +175,7 @@ export default function BMList() {
 			})
 			.catch((err) => {
 				dispatch(setLoadBmStatus(false));
-				console.log(err.response.data);
+				// console.log(err.response.data);
 				setLoading(false);
 				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
 					variant: "error",
@@ -176,6 +205,34 @@ export default function BMList() {
 		dispatch(setBmOwnersId(owners));
 		dispatch(setBmOwnersName(name));
 		dispatch(openBmOwnersDialog());
+	};
+	const handleClickCopyBackupEmail = (value) => {
+		copy(value);
+		enqueueSnackbar(`Đã copy back email`, {
+			variant: "success",
+		});
+	};
+	const handleClickCreateBackup = async (bmid, owners) => {
+		setLoading(true);
+		console.log(owners);
+		let response = await BmsServices.requestBackup(bmid, owners);
+		console.log(response);
+		if (response.success) {
+			if (response.status == true) {
+				enqueueSnackbar(response.messages, {
+					variant: "success",
+				});
+			} else if (response.status == false) {
+				enqueueSnackbar(response.messages, {
+					variant: "warning",
+				});
+			}
+		} else {
+			enqueueSnackbar(response.messages, {
+				variant: "error",
+			});
+		}
+		setLoading(false);
 	};
 
 	return (
@@ -233,6 +290,36 @@ export default function BMList() {
 									>
 										{columns.map((column, colIndex) => {
 											const value = row[column.id];
+											if (column.id == "backup_link") {
+												return (
+													<TableCell
+														key={column.id}
+														align={column.align}
+													>
+														<Tooltip
+															title="Click để copy"
+															placement="top"
+														>
+															<div
+																className={
+																	classes.backupLink
+																}
+																onClick={() => {
+																	handleClickCopyBackupEmail(
+																		value
+																	);
+																}}
+															>
+																{column.format
+																	? column.format(
+																			value
+																	  )
+																	: value}
+															</div>
+														</Tooltip>
+													</TableCell>
+												);
+											}
 											if (column.id == "options") {
 												return (
 													<TableCell
@@ -240,10 +327,35 @@ export default function BMList() {
 														align={column.align}
 													>
 														<Tooltip
+															title="Tạo backup"
+															placement="top"
+														>
+															<IconButton
+																component="div"
+																className={
+																	classes.optionButton
+																}
+																aria-label="Tạo backup"
+																color="primary"
+																disabled={
+																	loading
+																}
+																onClick={() =>
+																	handleClickCreateBackup(
+																		row.id,
+																		row.owner
+																	)
+																}
+															>
+																<SaveIcon />
+															</IconButton>
+														</Tooltip>
+														<Tooltip
 															title="Tài khoản ads"
 															placement="top"
 														>
 															<IconButton
+																component="div"
 																className={
 																	classes.optionButton
 																}
@@ -268,6 +380,7 @@ export default function BMList() {
 															placement="top"
 														>
 															<IconButton
+																component="div"
 																className={
 																	classes.optionButton
 																}
@@ -294,8 +407,7 @@ export default function BMList() {
 													key={column.id}
 													align={column.align}
 												>
-													{column.format &&
-													typeof value === "number"
+													{column.format
 														? column.format(value)
 														: value}
 												</TableCell>
