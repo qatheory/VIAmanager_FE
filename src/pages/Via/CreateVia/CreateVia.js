@@ -126,7 +126,7 @@ function CreateVIA(props) {
 	const handleCancel = () => {
 		props.history.push("/admin/manage-via");
 	};
-	const createVia = async (event, queueId) => {
+	const createVia = () => {
 		const { formValues } = formState;
 		let header = Commons.header();
 		let data = {
@@ -183,7 +183,7 @@ function CreateVIA(props) {
 				props.history.push("/admin/manage-via");
 			});
 	};
-	const handleSubmit = async (event, queueId) => {
+	const handleSubmit = () => {
 		console.log(queueId);
 		const { formValues } = formState;
 		setLoading(true);
@@ -248,10 +248,10 @@ function CreateVIA(props) {
 
 	// START Batch create section
 
-	const handleUploadFile = (event) => {
+	const handleUploadFile = async (event) => {
 		let file = event.target.files[0];
 		const reader = new FileReader();
-		reader.onload = (evt) => {
+		reader.onload = async (evt) => {
 			// evt = on_file_select event
 			/* Parse data */
 			const bstr = evt.target.result;
@@ -272,31 +272,115 @@ function CreateVIA(props) {
 				};
 			});
 			setBatchUploadVias(listCreateVias);
-			importVias(listCreateVias);
+			await importVias(listCreateVias);
 		};
-		reader.readAsBinaryString(file);
-		reader.close();
+		await reader.readAsBinaryString(file);
+		// reader.close();
 	};
 	const importVias = async (listCreateVias) => {
 		setBatchUploadStatus(true);
+		console.log(listCreateVias);
 		for (let i = 0; i < listCreateVias.length; i++) {
-			let viasCreateParams = {
-				viaName: listCreateVias.via,
-				viaFbid: listCreateVias.fbid,
-				viaEmail: listCreateVias.email,
-				viaPassword: listCreateVias.password,
-				viaEmailPassword: listCreateVias.email_password,
-				viaAccessToken: listCreateVias.access_token,
-				viaTFA: listCreateVias.tfa,
+			let viaCreateParams = {
+				viaName: listCreateVias[i].data.via,
+				viaFbid: listCreateVias[i].data.fbid,
+				viaEmail: listCreateVias[i].data.email,
+				viaPassword: listCreateVias[i].data.password,
+				viaEmailPassword: listCreateVias[i].data.email_password,
+				viaAccessToken: listCreateVias[i].data.access_token,
+				viaTFA: listCreateVias[i].data.tfa,
 			};
 
-			let newBatchUploadVias = [...batchUploadVias];
+			let newBatchUploadVias = [...listCreateVias];
 			newBatchUploadVias[i].status = "process";
 			newBatchUploadVias[i].note = "Đang xử lý";
-			SubmitListCreateVias(viasCreateParams);
+			setBatchUploadVias(newBatchUploadVias);
+			console.log(viaCreateParams);
+			let result = await submitListCreateVias(viaCreateParams);
+			console.log(result);
+			newBatchUploadVias[i].status = result.status;
+			newBatchUploadVias[i].note = result.note;
+			setBatchUploadVias(newBatchUploadVias);
 		}
-		setFormState(defaultFormState);
-		setQueueId(false);
+	};
+	const submitListCreateVias = async (viaCreateParams) => {
+		setLoading(true);
+		axios({
+			url: `https://graph.facebook.com/v8.0/me`,
+			method: "GET",
+			params: { access_token: viaCreateParams.viaAccessToken.trim() },
+		})
+			.then((resp) => {
+				createViaByList(viaCreateParams);
+			})
+			.catch((err) => {
+				console.log(err.response.data);
+				if (err.response.data.error) {
+					enqueueSnackbar("Access token không hợp lệ", {
+						variant: "error",
+					});
+					setLoading(false);
+					return {
+						note: "Access token không hợp lệ",
+						status: "error",
+					};
+				}
+				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+					variant: "error",
+				});
+				setLoading(false);
+				return {
+					note: "Xảy ra lỗi không xác định",
+					status: "error",
+				};
+			});
+	};
+	const createViaByList = async (viaCreateParams) => {
+		let header = Commons.header();
+		let data = {
+			name: viaCreateParams.viaName.trim(),
+			fbid: viaCreateParams.viaFbid.trim(),
+			email: viaCreateParams.viaEmail.trim(),
+			emailPassword: viaCreateParams.viaEmailPassword.trim(),
+			password: viaCreateParams.viaPassword.trim(),
+			accessToken: viaCreateParams.viaAccessToken.trim(),
+			tfa: viaCreateParams.viaTFA.trim(),
+			status: 1,
+		};
+		await axios({
+			url: `${Constants.API_DOMAIN}/api/vias/`,
+			method: "POST",
+			headers: header,
+			data: data,
+		})
+			.then((resp) => {
+				setLoading(false);
+				if (resp.data.status == "updated") {
+					return {
+						note: "Cập nhật thành công",
+						status: "updated",
+					};
+				}
+				if (resp.data.status == "created") {
+					return {
+						note: "Thêm via thành công",
+						status: "created",
+					};
+				}
+				return {
+					note: "Không nhận được phản hồi từ server",
+					status: "error",
+				};
+				// console.log(resp.data);
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+				return {
+					note: "Đã xảy ra lỗi không xác định",
+					status: "error",
+				};
+			});
 	};
 	const handleCloseBatchUpload = () => {
 		setBatchUploadStatus(false);
