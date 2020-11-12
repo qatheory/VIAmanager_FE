@@ -4,7 +4,6 @@ import Commons from "_helpers/commons.js";
 
 export default {
 	requestBackup: async (bmid, owners) => {
-		console.log(owners);
 		let header = Commons.header();
 		try {
 			let viaStatus = await axios({

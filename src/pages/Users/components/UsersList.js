@@ -126,7 +126,6 @@ export default function UsersList() {
 		dispatch(openDetailsDialog());
 	};
 	const handleClickDeleteUser = (usersID, username) => {
-		console.log(usersID, username);
 		dispatch(setUserDeleteId(usersID));
 		dispatch(setUserDeleteName(username));
 		dispatch(openUserDeleteDialog());

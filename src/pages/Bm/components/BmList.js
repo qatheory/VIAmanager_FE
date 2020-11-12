@@ -37,14 +37,17 @@ import SaveIcon from "@material-ui/icons/Save";
 import axios from "axios";
 import copy from "copy-to-clipboard";
 import BmsServices from "_services/bms.js";
+import { ExportToCsv } from "export-to-csv";
 
 import Constants from "_helpers/localConstants.js";
+import { setDownloadStatus } from "../../../store/reducers/bm";
 const formatDate = (expirationDate) => {
 	if (expirationDate == "") {
 		return "";
 	}
 	return moment(expirationDate).format("DD-MM-YYYY");
 };
+
 const convertVerificationStatus = (status) => {
 	switch (status) {
 		case "verified":
@@ -141,6 +144,7 @@ export default function BMList() {
 	let isLoadingBm = useSelector((state) => state.bm.isLoadingBm);
 	let selectedVia = useSelector((state) => state.bm.selectedVia);
 	let selectedStatus = useSelector((state) => state.bm.bmStatus);
+	let downloadStatus = useSelector((state) => state.bm.downloadStatus);
 	React.useEffect(() => {
 		if (isLoadingBm == true) {
 			getBmList();
@@ -149,6 +153,41 @@ export default function BMList() {
 	React.useEffect(() => {
 		getBmList();
 	}, []);
+	React.useEffect(() => {
+		if (downloadStatus == true) {
+			try {
+				downloadBmBackupLink();
+			} finally {
+				dispatch(setDownloadStatus(false));
+			}
+		}
+	}, [downloadStatus]);
+	const downloadBmBackupLink = () => {
+		let options = {
+			fieldSeparator: ",",
+			quoteStrings: '"',
+			decimalSeparator: ".",
+			filename: "Tổng hợp link backup",
+			showLabels: true,
+			// showTitle: true,
+			// title: "Tổng hợp link backup",
+			useTextFile: false,
+			useBom: true,
+			useKeysAsHeaders: true,
+		};
+		const csvExporter = new ExportToCsv(options);
+		let data = listBMs.map((bm) => {
+			bm = {
+				via: bm.name,
+				backup_link: bm.backup_link,
+				expiration_date: moment(bm.expiration_date).format(
+					"DD-MM-YYYY"
+				),
+			};
+			return bm;
+		});
+		csvExporter.generateCsv(data);
+	};
 	const getBmList = () => {
 		setLoading(true);
 		axios({
@@ -158,7 +197,6 @@ export default function BMList() {
 			params: { via: selectedVia, status: selectedStatus },
 		})
 			.then((resp) => {
-				console.log(resp);
 				setListBMs(resp.data.data);
 				if (resp.data.error.viaError.length != 0) {
 					enqueueSnackbar(
@@ -212,16 +250,20 @@ export default function BMList() {
 			variant: "success",
 		});
 	};
-	const handleClickCreateBackup = async (bmid, owners) => {
+	const handleClickCreateBackup = async (bmid, owners, rowIndex) => {
 		setLoading(true);
-		console.log(owners);
 		let response = await BmsServices.requestBackup(bmid, owners);
-		console.log(response);
 		if (response.success) {
-			if (response.status == true) {
+			if (response.status == "success") {
 				enqueueSnackbar(response.messages, {
 					variant: "success",
 				});
+				let newListBms = listBMs.slice();
+				newListBms[rowIndex].backup_email = response.data.backup_email;
+				newListBms[rowIndex].backup_link = response.data.backup_link;
+				newListBms[rowIndex].expiration_date =
+					response.data.expiration_date;
+				setListBMs(newListBms);
 			} else if (response.status == false) {
 				enqueueSnackbar(response.messages, {
 					variant: "warning",
@@ -275,14 +317,14 @@ export default function BMList() {
 								page * rowsPerPage,
 								page * rowsPerPage + rowsPerPage
 							)
-							.map((row) => {
+							.map((row, rowIndex) => {
 								return (
 									<TableRow
-										className={clsx({
-											[classes.rowDanger]: checkIfNotVerified(
-												row.verification_status
-											),
-										})}
+										// className={clsx({
+										// 	[classes.rowDanger]: checkIfNotVerified(
+										// 		row.verification_status
+										// 	),
+										// })}
 										hover
 										role="checkbox"
 										tabIndex={-1}
@@ -343,7 +385,8 @@ export default function BMList() {
 																onClick={() =>
 																	handleClickCreateBackup(
 																		row.id,
-																		row.owner
+																		row.owner,
+																		rowIndex
 																	)
 																}
 															>

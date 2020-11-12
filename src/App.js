@@ -58,7 +58,6 @@ function App(props) {
 					// }
 				})
 				.catch((err) => {
-					console.log(err);
 					dispatch(setLoggedOut());
 					localStorage.removeItem("token");
 					sessionStorage.removeItem("token");

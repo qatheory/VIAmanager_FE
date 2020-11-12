@@ -200,7 +200,6 @@ export default function AdsAccountsList() {
 			params: { via: selectedVia, status: selectedStatus },
 		})
 			.then((resp) => {
-				console.log(resp);
 				let adsAccounts = resp.data.data.map((adsAcc) => {
 					return adsAcc.business
 						? { ...adsAcc, businessName: adsAcc.business.name }

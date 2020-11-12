@@ -149,7 +149,6 @@ export default function VIAList() {
 			params: searchParams,
 		})
 			.then((resp) => {
-				console.log(resp);
 				dispatch(setLoadViasStatus(false));
 				setListVias(resp.data);
 				setLoading(false);
@@ -186,7 +185,6 @@ export default function VIAList() {
 	const handleClickCheckVia = async (id) => {
 		setLoading(true);
 		let viaStatus = await ViasServices.checkVia(id);
-		console.log(viaStatus);
 		if (viaStatus.success) {
 			if (viaStatus.status == true) {
 				enqueueSnackbar(viaStatus.messages, {

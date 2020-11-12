@@ -69,7 +69,6 @@ export default function UsersResetPassword(props) {
 			data: { password: userNewPassword.trim() },
 		})
 			.then((resp) => {
-				console.log(resp);
 				handleClose();
 				dispatch(setLoadUsersStatus(true));
 			})

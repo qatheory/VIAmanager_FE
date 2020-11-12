@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { makeStyles, fade } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
-
+import { CSVLink } from "react-csv";
 import {
 	Button,
 	InputBase,
@@ -15,6 +15,7 @@ import {
 } from "@material-ui/core";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import SearchIcon from "@material-ui/icons/Search";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import { Link } from "react-router-dom";
@@ -22,10 +23,12 @@ import {
 	setLoadBmStatus,
 	setSelectedVia,
 	setBmStatus,
+	setDownloadStatus,
 } from "store/reducers/bm";
 import Commons from "_helpers/commons.js";
 import axios from "axios";
 import Constants from "_helpers/localConstants.js";
+
 const useStyles = makeStyles((theme) => ({
 	card__header__item: {
 		margin: theme.spacing(1, 1),
@@ -93,6 +96,9 @@ function BmHeader(props) {
 	};
 	const handleRefresh = () => {
 		dispatch(setLoadBmStatus(true));
+	};
+	const handleExport = () => {
+		dispatch(setDownloadStatus(true));
 	};
 	return (
 		<Grid container spacing={0}>
@@ -173,6 +179,18 @@ function BmHeader(props) {
 					onClick={handleRefresh}
 				>
 					Làm mới
+				</Button>
+				<Button
+					variant="outlined"
+					color="primary"
+					className={clsx(
+						classes.card__header__item
+						// classes.floatRight
+					)}
+					endIcon={<GetAppIcon></GetAppIcon>}
+					onClick={handleExport}
+				>
+					Tải xuống
 				</Button>
 			</Grid>
 		</Grid>

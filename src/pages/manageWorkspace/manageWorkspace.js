@@ -71,7 +71,6 @@ function CreateVIA(props) {
 				headers: header,
 			})
 				.then((resp) => {
-					console.log(resp.data);
 					setFormState({
 						formValues: {
 							workspaceName: resp.data.name,
@@ -96,7 +95,6 @@ function CreateVIA(props) {
 	};
 	const handleSubmit = () => {
 		const { formValues } = formState;
-		console.log(formValues);
 		var bodyFormData = new FormData();
 		bodyFormData.append("name", formValues.workspaceName);
 		bodyFormData.append("accessToken", formValues.accessToken);
