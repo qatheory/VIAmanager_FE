@@ -17,6 +17,7 @@ import {
 	TablePagination,
 	Tooltip,
 	IconButton,
+	Checkbox,
 	LinearProgress,
 } from "@material-ui/core";
 import {
@@ -141,6 +142,9 @@ export default function BMList() {
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(10);
 	const [listBMs, setListBMs] = React.useState([]);
+	const [selected, setSelected] = React.useState([]);
+	const [numSelected, setNumSelected] = React.useState(0);
+	const [rowCount, setRowCount] = React.useState(0);
 	let isLoadingBm = useSelector((state) => state.bm.isLoadingBm);
 	let selectedVia = useSelector((state) => state.bm.selectedVia);
 	let selectedStatus = useSelector((state) => state.bm.bmStatus);
@@ -176,7 +180,16 @@ export default function BMList() {
 			useKeysAsHeaders: true,
 		};
 		const csvExporter = new ExportToCsv(options);
-		let data = listBMs.map((bm) => {
+		let selectedBms = listBMs.filter((bm) => {
+			if (selected.indexOf(bm.id) !== -1) {
+				return true;
+			}
+			return false;
+		});
+		if (selectedBms.length === 0) {
+			return;
+		}
+		let data = selectedBms.map((bm) => {
 			bm = {
 				via: bm.name,
 				backup_link: bm.backup_link,
@@ -202,7 +215,7 @@ export default function BMList() {
 					enqueueSnackbar(
 						`Xảy ra lỗi với Via: ${resp.data.error.viaError.join(
 							", "
-						)}`,
+						)}.\nHãy kiểm tra lại Accesss Token`,
 						{
 							variant: "error",
 						}
@@ -232,25 +245,34 @@ export default function BMList() {
 		setRowsPerPage(+event.target.value);
 		setPage(0);
 	};
-	const handleClickOpenOwnedAdsAcc = (name, id, owners) => {
+	const handleClickOpenOwnedAdsAcc = (event, name, id, owners) => {
+		event.stopPropagation();
+		event.nativeEvent.stopImmediatePropagation();
 		dispatch(setAdsAccOwnedId(id));
 		dispatch(setAdsAccOwnedName(name));
 		dispatch(setAdsAccOwnedVia(owners[0].id));
 		dispatch(openAdsAccOwnedDialog());
 	};
-	const handleClickOpenBmOwners = (name, owners) => {
+	const handleClickOpenBmOwners = (event, name, owners) => {
+		event.stopPropagation();
+		event.nativeEvent.stopImmediatePropagation();
 		owners = owners.map((owner) => owner.id);
 		dispatch(setBmOwnersId(owners));
 		dispatch(setBmOwnersName(name));
 		dispatch(openBmOwnersDialog());
 	};
-	const handleClickCopyBackupEmail = (value) => {
+	const handleClickCopyBackupLink = (event, value) => {
+		event.stopPropagation();
+		event.nativeEvent.stopImmediatePropagation();
+
 		copy(value);
 		enqueueSnackbar(`Đã copy back email`, {
 			variant: "success",
 		});
 	};
-	const handleClickCreateBackup = async (bmid, owners, rowIndex) => {
+	const handleClickCreateBackup = async (event, bmid, owners, rowIndex) => {
+		event.stopPropagation();
+		event.nativeEvent.stopImmediatePropagation();
 		setLoading(true);
 		let response = await BmsServices.requestBackup(bmid, owners);
 		if (response.success) {
@@ -276,6 +298,34 @@ export default function BMList() {
 		}
 		setLoading(false);
 	};
+	const isSelected = (name) => selected.indexOf(name) !== -1;
+	const handleSelectAllClick = (event) => {
+		if (event.target.checked) {
+			const newSelecteds = listBMs.map((n) => n.id);
+			setSelected(newSelecteds);
+			return;
+		}
+		setSelected([]);
+	};
+	const handleClickSelect = (event, id) => {
+		const selectedIndex = selected.indexOf(id);
+		let newSelected = [];
+
+		if (selectedIndex === -1) {
+			newSelected = newSelected.concat(selected, id);
+		} else if (selectedIndex === 0) {
+			newSelected = newSelected.concat(selected.slice(1));
+		} else if (selectedIndex === selected.length - 1) {
+			newSelected = newSelected.concat(selected.slice(0, -1));
+		} else if (selectedIndex > 0) {
+			newSelected = newSelected.concat(
+				selected.slice(0, selectedIndex),
+				selected.slice(selectedIndex + 1)
+			);
+		}
+
+		setSelected(newSelected);
+	};
 
 	return (
 		<Paper variant="outlined" className={classes.root}>
@@ -283,6 +333,26 @@ export default function BMList() {
 				<Table aria-label="sticky table">
 					<TableHead>
 						<TableRow>
+							<TableCell
+								padding="checkbox"
+								className={classes.tableHeaderCell}
+							>
+								<Checkbox
+									color="primary"
+									indeterminate={
+										selected.length > 0 &&
+										selected.length < listBMs.length
+									}
+									checked={
+										selected.length > 0 &&
+										selected.length === listBMs.length
+									}
+									onChange={handleSelectAllClick}
+									inputProps={{
+										"aria-label": "Chọn tất cả BM",
+									}}
+								/>
+							</TableCell>
 							{columns.map((column) => (
 								<TableCell
 									className={classes.tableHeaderCell}
@@ -297,7 +367,7 @@ export default function BMList() {
 						<TableRow className={classes.loadingRow}>
 							<TableCell
 								className={classes.loadingCell}
-								colSpan={columns.length}
+								colSpan={columns.length + 1}
 							>
 								{loading && (
 									<LinearProgress
@@ -318,6 +388,7 @@ export default function BMList() {
 								page * rowsPerPage + rowsPerPage
 							)
 							.map((row, rowIndex) => {
+								const isItemSelected = isSelected(row.id);
 								return (
 									<TableRow
 										// className={clsx({
@@ -325,11 +396,25 @@ export default function BMList() {
 										// 		row.verification_status
 										// 	),
 										// })}
+										onClick={(event) =>
+											handleClickSelect(event, row.id)
+										}
 										hover
 										role="checkbox"
+										aria-checked={isItemSelected}
+										selected={isItemSelected}
 										tabIndex={-1}
 										key={row.id}
 									>
+										<TableCell padding="checkbox">
+											<Checkbox
+												color="primary"
+												checked={isItemSelected}
+												// inputProps={{
+												// 	"aria-labelledby": labelId,
+												// }}
+											/>
+										</TableCell>
 										{columns.map((column, colIndex) => {
 											const value = row[column.id];
 											if (column.id == "backup_link") {
@@ -346,8 +431,11 @@ export default function BMList() {
 																className={
 																	classes.backupLink
 																}
-																onClick={() => {
-																	handleClickCopyBackupEmail(
+																onClick={(
+																	event
+																) => {
+																	handleClickCopyBackupLink(
+																		event,
 																		value
 																	);
 																}}
@@ -382,8 +470,11 @@ export default function BMList() {
 																disabled={
 																	loading
 																}
-																onClick={() =>
+																onClick={(
+																	event
+																) =>
 																	handleClickCreateBackup(
+																		event,
 																		row.id,
 																		row.owner,
 																		rowIndex
@@ -407,8 +498,11 @@ export default function BMList() {
 																disabled={
 																	loading
 																}
-																onClick={() =>
+																onClick={(
+																	event
+																) =>
 																	handleClickOpenOwnedAdsAcc(
+																		event,
 																		row.name,
 																		row.id,
 																		row.owner
@@ -432,8 +526,11 @@ export default function BMList() {
 																disabled={
 																	loading
 																}
-																onClick={() =>
+																onClick={(
+																	event
+																) =>
 																	handleClickOpenBmOwners(
+																		event,
 																		row.name,
 																		row.owner
 																	)

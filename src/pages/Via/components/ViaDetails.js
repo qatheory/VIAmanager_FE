@@ -192,7 +192,7 @@ export default function ViaDetails(props) {
 			.catch((err) => {
 				console.log(err.response.data);
 				if (err.response.data.error) {
-					enqueueSnackbar("Access token không hợp lệ", {
+					enqueueSnackbar("Access token không hoạt động", {
 						variant: "error",
 					});
 					setLoading(false);

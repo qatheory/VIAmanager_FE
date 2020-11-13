@@ -182,9 +182,9 @@ export default function VIAList() {
 		dispatch(setViaLoginInfo({ name, email, password, tfa }));
 		dispatch(openLoginDialog());
 	};
-	const handleClickCheckVia = async (id) => {
+	const handleClickCheckStoredVia = async (id) => {
 		setLoading(true);
-		let viaStatus = await ViasServices.checkVia(id);
+		let viaStatus = await ViasServices.checkStoredVia(id);
 		if (viaStatus.success) {
 			if (viaStatus.status == true) {
 				enqueueSnackbar(viaStatus.messages, {
@@ -310,7 +310,7 @@ export default function VIAList() {
 																		loading
 																	}
 																	onClick={() =>
-																		handleClickCheckVia(
+																		handleClickCheckStoredVia(
 																			row.id
 																		)
 																	}

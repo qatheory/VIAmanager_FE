@@ -223,7 +223,7 @@ export default function AdsAccountsList() {
 				dispatch(setLoadAdsAccStatus(false));
 				console.log(err.response.data);
 				if (err.response.data.error) {
-					enqueueSnackbar("Access token không hợp lệ", {
+					enqueueSnackbar("Access token không hoạt động", {
 						variant: "error",
 					});
 					setLoading(false);
@@ -248,6 +248,7 @@ export default function AdsAccountsList() {
 	};
 	const handleClickOpenAdsAccOwners = (owners, name) => {
 		owners = owners.map((owner) => owner.viaId);
+		console.log(owners);
 		dispatch(setAdsAccOwnersName(name));
 		dispatch(setAdsAccOwnersId(owners));
 		dispatch(openAdsAccOwnersDialog());
@@ -342,6 +343,7 @@ export default function AdsAccountsList() {
 																placement="top"
 															>
 																<IconButton
+																	component="div"
 																	className={
 																		classes.optionButton
 																	}

@@ -34,23 +34,18 @@ import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import axios from "axios";
 import Constants from "_helpers/localConstants.js";
-const getProfileGroup = (profile) => {
-	return profile ? profile.group : "";
-};
-const getProfileLabel = (profile) => {
-	return profile ? profile.label : "";
-};
+
 const columns = [
 	{ id: "username", label: "Tài khoản", minWidth: 100 },
-	{ id: "profile", label: "Nhóm", minWidth: 100, format: getProfileGroup },
+	{ id: "group", label: "Nhóm", minWidth: 100 },
 	{
 		id: "profile",
 		label: "Chú thích",
 		minWidth: 100,
-		format: getProfileLabel,
+		// format: getProfileLabel,
 	},
 	{
-		id: "options",
+		id: "label",
 		label: "Tùy chọn",
 		// minWidth: 170,
 		align: "right",
@@ -106,7 +101,20 @@ export default function UsersList() {
 		})
 			.then((resp) => {
 				dispatch(setLoadUsersStatus(false));
-				setListUsers(resp.data);
+				console.log(resp.data);
+				let profileExtractedUsers = resp.data.map((user) => {
+					if (user.profile) {
+						user.group = user.profile.group;
+						user.label = user.profile.label;
+						delete user["profile"];
+						return user;
+					}
+					user.group = "";
+					user.label = "";
+					delete user["profile"];
+					return user;
+				});
+				setListUsers(profileExtractedUsers);
 			})
 			.catch((err) => {
 				dispatch(setLoadUsersStatus(false));

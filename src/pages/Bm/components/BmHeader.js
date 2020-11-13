@@ -157,10 +157,10 @@ function BmHeader(props) {
 									Mọi trạng thái
 								</MenuItem>
 								<MenuItem key={1} value={1}>
-									Đang hoạt động
+									Đã xác minh
 								</MenuItem>
 								<MenuItem key={2} value={2}>
-									Không hoạt động
+									Chưa xác minh
 								</MenuItem>
 							</Select>
 						</FormControl>

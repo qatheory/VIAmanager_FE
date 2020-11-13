@@ -4,7 +4,7 @@ import Commons from "_helpers/commons.js";
 
 let header = Commons.header();
 export default {
-	checkVia: async (id) => {
+	checkStoredVia: async (id) => {
 		let header = Commons.header();
 
 		try {
@@ -13,10 +13,67 @@ export default {
 				method: "GET",
 				headers: header,
 			});
+			console.log(viaStatus);
 			return viaStatus.data;
 		} catch (err) {
 			console.log(err.response.data);
 			return { success: false, messages: "Đã xảy ra lỗi không xác định" };
+		}
+	},
+	checkVia: async (id) => {
+		try {
+			await axios({
+				url: `https://graph.facebook.com/v8.0/me`,
+				method: "GET",
+				params: { access_token: id },
+			});
+
+			return {
+				message: "Kiểm tra thành công",
+				status: "success",
+			};
+		} catch (err) {
+			console.log(err.response.data);
+			if (err.response.data.error) {
+				return {
+					message: "Access token không hoạt động",
+					status: "error",
+					error: err,
+				};
+			}
+			return {
+				message: "Đã có lỗi xảy ra!!!",
+				status: "error",
+				error: err,
+			};
+		}
+	},
+	createVia: async (data) => {
+		try {
+			await axios({
+				url: `${Constants.API_DOMAIN}/api/vias/`,
+				method: "POST",
+				headers: header,
+				data: data,
+			});
+			return {
+				message: "Tạo via thành công",
+				status: "success",
+			};
+		} catch (err) {
+			console.log(err.response.data);
+			if (err.response.data.error) {
+				return {
+					message: "Access token không hoạt động",
+					status: "error",
+					error: err,
+				};
+			}
+			return {
+				message: "Đã có lỗi xảy ra!!!",
+				status: "error",
+				error: err,
+			};
 		}
 	},
 };

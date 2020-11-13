@@ -26,7 +26,7 @@ import {
 	TableBody,
 } from "@material-ui/core";
 import blue from "@material-ui/core/colors/blue";
-
+import green from "@material-ui/core/colors/green";
 import { useSnackbar } from "notistack";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
@@ -35,6 +35,8 @@ import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import axios from "axios";
 import Constants from "_helpers/localConstants.js";
 import Commons from "_helpers/commons.js";
+import ViasServices from "_services/vias.js";
+
 let defaultFormState = {
 	formValues: {
 		viaName: "",
@@ -114,7 +116,6 @@ function CreateVIA(props) {
 	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	const [loading, setLoading] = React.useState(false);
 	const [batchUploadStatus, setBatchUploadStatus] = React.useState(false);
-	const [queueId, setQueueId] = React.useState(false);
 	const [batchUploadVias, setBatchUploadVias] = React.useState([]);
 	const [formState, setFormState] = React.useState(defaultFormState);
 	const handleChange = ({ target }) => {
@@ -126,7 +127,7 @@ function CreateVIA(props) {
 	const handleCancel = () => {
 		props.history.push("/admin/manage-via");
 	};
-	const createVia = () => {
+	const createVia = async () => {
 		const { formValues } = formState;
 		let header = Commons.header();
 		let data = {
@@ -148,81 +149,57 @@ function CreateVIA(props) {
 		if (formValues.viaDob) {
 			data.gender = formValues.viaGender.trim();
 		}
-		axios({
-			url: `${Constants.API_DOMAIN}/api/vias/`,
-			method: "POST",
-			headers: header,
-			data: data,
-		})
-			.then((resp) => {
-				setLoading(false);
-				if (queueId) {
-					let newBatchUploadVias = [...batchUploadVias];
-					if (resp.data.status == "updated") {
-						newBatchUploadVias.note = "cập nhật thành công";
-						newBatchUploadVias.status = "updated";
-					}
-					if (resp.data.status == "created") {
-						newBatchUploadVias.note = "Thêm via thành công";
-						newBatchUploadVias.status = "created";
-					}
-					return;
-				}
-				props.history.push("/admin/manage-via");
-				// console.log(resp.data);
-			})
-			.catch((err) => {
-				setLoading(false);
-				console.log(err);
-				if (queueId) {
-					let newBatchUploadVias = [...batchUploadVias];
-					newBatchUploadVias.note = "Đã xảy ra lỗi không xác định";
-					newBatchUploadVias.status = "error";
-					return;
-				}
-				props.history.push("/admin/manage-via");
+		try {
+			let createViaResult = await ViasServices.createVia(data);
+			if (createViaResult.status == "success") {
+				enqueueSnackbar(createViaResult.message, {
+					variant: createViaResult.status,
+				});
+				return;
+			} else {
+				enqueueSnackbar(createViaResult.message, {
+					variant: createViaResult.status,
+				});
+				return;
+			}
+		} catch (err) {
+			enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+				variant: "error",
 			});
+			setLoading(false);
+			return;
+		} finally {
+			setLoading(false);
+			props.history.push("/admin/manage-via");
+		}
 	};
-	const handleSubmit = () => {
-		console.log(queueId);
+	const handleSubmit = async () => {
 		const { formValues } = formState;
 		setLoading(true);
-		axios({
-			url: `https://graph.facebook.com/v8.0/me`,
-			method: "GET",
-			params: { access_token: formValues.viaAccessToken.trim() },
-		})
-			.then((resp) => {
-				createVia(queueId);
-			})
-			.catch((err) => {
-				console.log(err.response.data);
-				if (err.response.data.error) {
-					enqueueSnackbar("Access token không hợp lệ", {
-						variant: "error",
-					});
-					setLoading(false);
-					if (queueId) {
-						let newBatchUploadVias = [...batchUploadVias];
-						newBatchUploadVias.note = "Access token không hợp lệ";
-						newBatchUploadVias.status = "error";
-						return;
-					}
-					return;
-				}
-				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
-					variant: "error",
+		try {
+			let checkViasResult = await ViasServices.checkVia(
+				formValues.viaAccessToken.trim()
+			);
+			if (checkViasResult.status == "success") {
+				createVia();
+			} else {
+				enqueueSnackbar(checkViasResult.message, {
+					variant: checkViasResult.status,
 				});
 				setLoading(false);
-				if (queueId) {
-					let newBatchUploadVias = [...batchUploadVias];
-					newBatchUploadVias.note = "Xảy ra lỗi không xác định";
-					newBatchUploadVias.status = "error";
-					return;
-				}
 				return;
+			}
+		} catch (err) {
+			enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+				variant: "error",
 			});
+			setLoading(false);
+			return;
+		}
 	};
+
+	// START Batch create section
+
 	const convertToJson = (csv) => {
 		var lines = csv.split("\n");
 
@@ -242,11 +219,8 @@ function CreateVIA(props) {
 			}
 		}
 
-		//return result; //JavaScript object
 		return result; //JSON
 	};
-
-	// START Batch create section
 
 	const handleUploadFile = async (event) => {
 		let file = event.target.files[0];
@@ -271,7 +245,7 @@ function CreateVIA(props) {
 					status: "waiting",
 				};
 			});
-			setBatchUploadVias(listCreateVias);
+			await setBatchUploadVias(listCreateVias);
 			await importVias(listCreateVias);
 		};
 		await reader.readAsBinaryString(file);
@@ -279,7 +253,6 @@ function CreateVIA(props) {
 	};
 	const importVias = async (listCreateVias) => {
 		setBatchUploadStatus(true);
-		console.log(listCreateVias);
 		for (let i = 0; i < listCreateVias.length; i++) {
 			let viaCreateParams = {
 				viaName: listCreateVias[i].data.via,
@@ -291,49 +264,49 @@ function CreateVIA(props) {
 				viaTFA: listCreateVias[i].data.tfa,
 			};
 
-			let newBatchUploadVias = [...listCreateVias];
-			newBatchUploadVias[i].status = "process";
-			newBatchUploadVias[i].note = "Đang xử lý";
-			setBatchUploadVias(newBatchUploadVias);
-			console.log(viaCreateParams);
+			listCreateVias[i].status = "process";
+			listCreateVias[i].note = "Đang xử lý";
+			setBatchUploadVias([...listCreateVias]);
+
 			let result = await submitListCreateVias(viaCreateParams);
-			console.log(result);
-			newBatchUploadVias[i].status = result.status;
-			newBatchUploadVias[i].note = result.note;
-			setBatchUploadVias(newBatchUploadVias);
+			listCreateVias[i].status = result.status;
+			listCreateVias[i].note = result.note;
+			setBatchUploadVias([...listCreateVias]);
 		}
+		setBatchUploadVias([...listCreateVias]);
 	};
+
 	const submitListCreateVias = async (viaCreateParams) => {
 		setLoading(true);
-		axios({
-			url: `https://graph.facebook.com/v8.0/me`,
-			method: "GET",
-			params: { access_token: viaCreateParams.viaAccessToken.trim() },
-		})
-			.then((resp) => {
-				createViaByList(viaCreateParams);
-			})
-			.catch((err) => {
-				console.log(err.response.data);
-				if (err.response.data.error) {
-					enqueueSnackbar("Access token không hợp lệ", {
-						variant: "error",
-					});
-					setLoading(false);
-					return {
-						note: "Access token không hợp lệ",
-						status: "error",
-					};
-				}
-				enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+		try {
+			await axios({
+				url: `https://graph.facebook.com/v8.0/me`,
+				method: "GET",
+				params: { access_token: viaCreateParams.viaAccessToken.trim() },
+			});
+			let createViaResult = await createViaByList(viaCreateParams);
+			return createViaResult;
+		} catch (err) {
+			console.log(err);
+			if (err) {
+				enqueueSnackbar("Access token không hoạt động", {
 					variant: "error",
 				});
 				setLoading(false);
 				return {
-					note: "Xảy ra lỗi không xác định",
+					note: "Access token không hoạt động",
 					status: "error",
 				};
+			}
+			enqueueSnackbar("Đã có lỗi xảy ra!!!", {
+				variant: "error",
 			});
+			setLoading(false);
+			return {
+				note: "Xảy ra lỗi không xác định",
+				status: "error",
+			};
+		}
 	};
 	const createViaByList = async (viaCreateParams) => {
 		let header = Commons.header();
@@ -347,40 +320,38 @@ function CreateVIA(props) {
 			tfa: viaCreateParams.viaTFA.trim(),
 			status: 1,
 		};
-		await axios({
-			url: `${Constants.API_DOMAIN}/api/vias/`,
-			method: "POST",
-			headers: header,
-			data: data,
-		})
-			.then((resp) => {
-				setLoading(false);
-				if (resp.data.status == "updated") {
-					return {
-						note: "Cập nhật thành công",
-						status: "updated",
-					};
-				}
-				if (resp.data.status == "created") {
-					return {
-						note: "Thêm via thành công",
-						status: "created",
-					};
-				}
-				return {
-					note: "Không nhận được phản hồi từ server",
-					status: "error",
-				};
-				// console.log(resp.data);
-			})
-			.catch((err) => {
-				setLoading(false);
-				console.log(err);
-				return {
-					note: "Đã xảy ra lỗi không xác định",
-					status: "error",
-				};
+		try {
+			let resp = await axios({
+				url: `${Constants.API_DOMAIN}/api/vias/`,
+				method: "POST",
+				headers: header,
+				data: data,
 			});
+			if (resp.data.status == "updated") {
+				return {
+					note: "Cập nhật thành công",
+					status: "updated",
+				};
+			}
+			if (resp.data.status == "created") {
+				return {
+					note: "Thêm via thành công",
+					status: "created",
+				};
+			}
+			return {
+				note: "Không nhận được phản hồi từ server",
+				status: "error",
+			};
+		} catch (err) {
+			console.log(err);
+			return {
+				note: "Đã xảy ra lỗi không xác định",
+				status: "error",
+			};
+		} finally {
+			setLoading(false);
+		}
 	};
 	const handleCloseBatchUpload = () => {
 		setBatchUploadStatus(false);
@@ -389,15 +360,19 @@ function CreateVIA(props) {
 	const getStatusIcon = (status) => {
 		switch (status) {
 			case "created":
-				return <AddCircleOutlineOutlinedIcon />;
+				return (
+					<AddCircleOutlineOutlinedIcon
+						style={{ color: green[500] }}
+					/>
+				);
 			case "updated":
-				return <CheckCircleOutlineIcon />;
+				return <CheckCircleOutlineIcon color="primary" />;
 			case "error":
-				return <ErrorOutlineIcon />;
+				return <ErrorOutlineIcon color="secondary" />;
 			case "waiting":
-				return <PauseCircleOutlineIcon />;
+				return <PauseCircleOutlineIcon color="action" />;
 			default:
-				return <CircularProgress />;
+				return <CircularProgress size={24} />;
 		}
 	};
 	return (
@@ -613,7 +588,10 @@ function CreateVIA(props) {
 						</DialogTitle>
 						<DialogContent>
 							<TableContainer>
-								<Table aria-label="sticky table">
+								<Table
+									size="small"
+									aria-label="sticky dense table"
+								>
 									<TableHead>
 										<TableRow>
 											{columns.map((column) => (
@@ -637,7 +615,7 @@ function CreateVIA(props) {
 													hover
 													role="checkbox"
 													tabIndex={-1}
-													key={row.id}
+													key={row.data.name}
 												>
 													{columns.map(
 														(column, colIndex) => {

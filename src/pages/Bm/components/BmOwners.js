@@ -53,7 +53,8 @@ export default function BmOwners(props) {
 	let bmOwnersName = useSelector((state) => state.bm.bmOwnersName);
 
 	useEffect(() => {
-		if (bmOwnersId.length != 0) {
+		if (bmOwnersId.length !== 0) {
+			console.log(bmOwnersId);
 			let header = Commons.header();
 			axios({
 				url: `${Constants.API_DOMAIN}/api/vias/`,
