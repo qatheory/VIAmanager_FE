@@ -13,7 +13,6 @@ export default {
 				method: "GET",
 				headers: header,
 			});
-			console.log(viaStatus);
 			return viaStatus.data;
 		} catch (err) {
 			console.log(err.response.data);

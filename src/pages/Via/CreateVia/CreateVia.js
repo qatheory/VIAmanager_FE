@@ -141,7 +141,7 @@ function CreateVIA(props) {
 			fbLink: formValues.viaFbLink.trim(),
 			fbName: formValues.viaFbName.trim(),
 			label: formValues.viaLabel.trim(),
-			status: 1,
+			// status: null,
 		};
 		if (formValues.viaDob) {
 			data.dateOfBirth = formValues.viaDob.trim();
@@ -211,7 +211,6 @@ function CreateVIA(props) {
 		headers.map((field) => {
 			return field.trim().toLowerCase();
 		});
-		console.log(headers);
 		if (headers.indexOf("via") === -1) {
 			isValidExcelFile = false;
 			missingFields.push("via");
@@ -280,7 +279,6 @@ function CreateVIA(props) {
 			await importVias(listCreateVias);
 		};
 		await reader.readAsBinaryString(file);
-		event.target.value = null;
 		// reader.close();
 	};
 	const importVias = async (listCreateVias) => {
@@ -343,14 +341,22 @@ function CreateVIA(props) {
 	const createViaByList = async (viaCreateParams) => {
 		let header = Commons.header();
 		let data = {
-			name: viaCreateParams.viaName.trim(),
-			fbid: viaCreateParams.viaFbid.trim(),
-			email: viaCreateParams.viaEmail.trim(),
-			emailPassword: viaCreateParams.viaEmailPassword.trim(),
-			password: viaCreateParams.viaPassword.trim(),
-			accessToken: viaCreateParams.viaAccessToken.trim(),
-			tfa: viaCreateParams.viaTFA.trim(),
-			status: 1,
+			name: viaCreateParams.viaName ? viaCreateParams.viaName.trim() : "",
+			fbid: viaCreateParams.viaFbid ? viaCreateParams.viaFbid.trim() : "",
+			email: viaCreateParams.viaEmail
+				? viaCreateParams.viaEmail.trim()
+				: "",
+			emailPassword: viaCreateParams.viaEmailPassword
+				? viaCreateParams.viaEmailPassword.trim()
+				: "",
+			password: viaCreateParams.viaPassword
+				? viaCreateParams.viaPassword.trim()
+				: "",
+			accessToken: viaCreateParams.viaAccessToken
+				? viaCreateParams.viaAccessToken.trim()
+				: "",
+			tfa: viaCreateParams.viaTFA ? viaCreateParams.viaTFA.trim() : "",
+			// status: null,
 		};
 		try {
 			let resp = await axios({
@@ -582,7 +588,7 @@ function CreateVIA(props) {
 							</Button>
 
 							<input
-								accept=".csv"
+								accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
 								className={classes.input}
 								style={{ display: "none" }}
 								id="raised-button-file"
@@ -590,6 +596,7 @@ function CreateVIA(props) {
 								type="file"
 								disabled={loading}
 								onChange={handleUploadFile}
+								onClick={(e) => (e.target.value = null)}
 							/>
 							<label htmlFor="raised-button-file">
 								<Button
@@ -598,6 +605,7 @@ function CreateVIA(props) {
 									color="primary"
 									disabled={loading}
 									className={classes.button}
+									value={""}
 								>
 									Upload
 								</Button>
