@@ -204,9 +204,29 @@ function CreateVIA(props) {
 		var lines = csv.split("\n");
 
 		var result = [];
+		let isValidExcelFile = true;
+		let missingFields = [];
 
 		var headers = lines[0].split(",");
-
+		headers.map((field) => {
+			return field.trim().toLowerCase();
+		});
+		console.log(headers);
+		if (headers.indexOf("via") === -1) {
+			isValidExcelFile = false;
+			missingFields.push("via");
+		}
+		if (headers.indexOf("fbid") === -1) {
+			isValidExcelFile = false;
+			missingFields.push("fbid");
+		}
+		if (headers.indexOf("access_token") === -1) {
+			isValidExcelFile = false;
+			missingFields.push("access_token");
+		}
+		if (isValidExcelFile == false) {
+			return { error: { missingFields: missingFields } };
+		}
 		for (var i = 1; i < lines.length; i++) {
 			var obj = {};
 			var currentline = lines[i].split(",");
@@ -237,6 +257,17 @@ function CreateVIA(props) {
 			const data = XLSX.utils.sheet_to_csv(ws, { header: 1 });
 			/* Update state */
 			let listCreateVias = convertToJson(data); // shows data in json format
+			if (listCreateVias.error) {
+				enqueueSnackbar(
+					`File không đúng quy định, thiếu trường ${listCreateVias.error.missingFields.join(
+						", "
+					)}`,
+					{
+						variant: "error",
+					}
+				);
+				return;
+			}
 			listCreateVias = listCreateVias.map((via) => {
 				return {
 					name: via.via,
@@ -249,6 +280,7 @@ function CreateVIA(props) {
 			await importVias(listCreateVias);
 		};
 		await reader.readAsBinaryString(file);
+		event.target.value = null;
 		// reader.close();
 	};
 	const importVias = async (listCreateVias) => {

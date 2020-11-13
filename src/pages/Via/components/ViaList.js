@@ -182,7 +182,7 @@ export default function VIAList() {
 		dispatch(setViaLoginInfo({ name, email, password, tfa }));
 		dispatch(openLoginDialog());
 	};
-	const handleClickCheckStoredVia = async (id) => {
+	const handleClickCheckStoredVia = async (id, rowIndex) => {
 		setLoading(true);
 		let viaStatus = await ViasServices.checkStoredVia(id);
 		if (viaStatus.success) {
@@ -190,10 +190,16 @@ export default function VIAList() {
 				enqueueSnackbar(viaStatus.messages, {
 					variant: "success",
 				});
+				let newListVias = [...listVias];
+				newListVias[rowIndex].status = 1;
+				setListVias(newListVias);
 			} else if (viaStatus.status == false) {
 				enqueueSnackbar(viaStatus.messages, {
 					variant: "warning",
 				});
+				let newListVias = [...listVias];
+				newListVias[rowIndex].status = 0;
+				setListVias(newListVias);
 			}
 		} else {
 			enqueueSnackbar(viaStatus.messages, {
@@ -249,7 +255,7 @@ export default function VIAList() {
 									page * rowsPerPage,
 									page * rowsPerPage + rowsPerPage
 								)
-								.map((row) => {
+								.map((row, rowIndex) => {
 									return (
 										<TableRow
 											className={clsx({
@@ -267,29 +273,7 @@ export default function VIAList() {
 										>
 											{columns.map((column, colIndex) => {
 												const value = row[column.id];
-												// if (colIndex == 3) {
-												// 	return (
-												// 		<TableCell
-												// 			key={column.id}
-												// 			align={column.align}
-												// 		>
-												// 			{convertViaStatus(
-												// 				value
-												// 			)}
-												// 		</TableCell>
-												// 	);
-												// }
-												// if (colIndex == 4) {
-												// 	return (
-												// 		<TableCell
-												// 			key={column.id}
-												// 			align={column.align}
-												// 		>
-												// 			this is key
-												// 		</TableCell>
-												// 	);
-												// }
-												if (colIndex == 5) {
+												if (column.id == "options") {
 													return (
 														<TableCell
 															key={column.id}
@@ -311,7 +295,8 @@ export default function VIAList() {
 																	}
 																	onClick={() =>
 																		handleClickCheckStoredVia(
-																			row.id
+																			row.id,
+																			rowIndex
 																		)
 																	}
 																>
