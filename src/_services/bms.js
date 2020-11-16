@@ -14,7 +14,22 @@ export default {
 			});
 			return viaStatus.data;
 		} catch (err) {
-			console.log(err.response.data);
+			console.log(err);
+			return { success: false, messages: "Đã xảy ra lỗi không xác định" };
+		}
+	},
+	checkBM: async (bmid, owners) => {
+		let header = Commons.header();
+		try {
+			let viaStatus = await axios({
+				url: `${Constants.API_DOMAIN}/api/bm-check/`,
+				method: "POST",
+				headers: header,
+				data: { bmid, viaFbId: owners.join(",") },
+			});
+			return viaStatus.data;
+		} catch (err) {
+			console.log(err);
 			return { success: false, messages: "Đã xảy ra lỗi không xác định" };
 		}
 	},

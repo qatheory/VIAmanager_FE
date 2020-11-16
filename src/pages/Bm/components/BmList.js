@@ -34,6 +34,7 @@ import { useSnackbar } from "notistack";
 import blue from "@material-ui/core/colors/blue";
 import LocalActivityIcon from "@material-ui/icons/LocalActivity";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import AutorenewIcon from "@material-ui/icons/Autorenew";
 import SaveIcon from "@material-ui/icons/Save";
 import axios from "axios";
 import copy from "copy-to-clipboard";
@@ -59,20 +60,40 @@ const convertVerificationStatus = (status) => {
 			return "";
 	}
 };
+
+const convertBmStatus = (status) => {
+	switch (status) {
+		case "0":
+			return "Bị giới hạn";
+		case "1":
+			return "Đang hoạt động";
+		default:
+			return "Chưa kiểm tra";
+	}
+};
+
 const columns = [
 	{ id: "name", label: "BM", minWidth: 100 },
-	{ id: "id", label: "ID", minWidth: 100 },
+	{ id: "id", label: "ID" },
 	{
 		id: "verification_status",
-		label: "Trạng thái",
-		align: "right",
+		label: "Trạng thái xác minh",
+		align: "center",
+		minWidth: 150,
 		format: convertVerificationStatus,
 	},
 	{
-		id: "backup_email",
-		label: "Email backup",
-		align: "right",
+		id: "status",
+		label: "Trạng thái hoạt động",
+		align: "center",
+		minWidth: 150,
+		format: convertBmStatus,
 	},
+	// {
+	// 	id: "backup_email",
+	// 	label: "Email backup",
+	// 	align: "right",
+	// },
 	{
 		id: "backup_link",
 		label: "Link backup",
@@ -82,6 +103,7 @@ const columns = [
 		id: "expiration_date",
 		label: "Ngày hết hạn",
 		align: "right",
+		minWidth: 100,
 		format: formatDate,
 	},
 	{
@@ -252,6 +274,35 @@ export default function BMList() {
 		dispatch(setAdsAccOwnedName(name));
 		dispatch(setAdsAccOwnedVia(owners[0].id));
 		dispatch(openAdsAccOwnedDialog());
+	};
+	const handleClickCheckBm = async (event, bmid, owners, rowIndex) => {
+		event.stopPropagation();
+		event.nativeEvent.stopImmediatePropagation();
+		setLoading(true);
+		owners = owners.map((owner) => owner.id);
+		let response = await BmsServices.checkBM(bmid, owners);
+		if (response.success) {
+			if (response.status == "created" || response.status == "updated") {
+				enqueueSnackbar(response.messages, {
+					variant: "success",
+				});
+				let newListBms = [...listBMs];
+				newListBms[rowIndex].status = response.data.status;
+				setListBMs(newListBms);
+			} else if (response.status == "failed") {
+				enqueueSnackbar(response.messages, {
+					variant: "warning",
+				});
+			}
+		} else {
+			enqueueSnackbar(response.messages, {
+				variant: "error",
+			});
+		}
+		setLoading(false);
+		// dispatch(setBmOwnersId(owners));
+		// dispatch(setBmOwnersName(id));
+		// dispatch(openBmOwnersDialog());
 	};
 	const handleClickOpenBmOwners = (event, name, owners) => {
 		event.stopPropagation();
@@ -456,6 +507,34 @@ export default function BMList() {
 														key={column.id}
 														align={column.align}
 													>
+														<Tooltip
+															title="Kiểm tra BM"
+															placement="top"
+														>
+															<IconButton
+																component="div"
+																className={
+																	classes.optionButton
+																}
+																aria-label="Kiểm tra BM"
+																color="primary"
+																disabled={
+																	loading
+																}
+																onClick={(
+																	event
+																) =>
+																	handleClickCheckBm(
+																		event,
+																		row.id,
+																		row.owner,
+																		rowIndex
+																	)
+																}
+															>
+																<AutorenewIcon />
+															</IconButton>
+														</Tooltip>
 														<Tooltip
 															title="Tạo backup"
 															placement="top"
