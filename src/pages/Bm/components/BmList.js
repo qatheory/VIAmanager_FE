@@ -63,9 +63,9 @@ const convertVerificationStatus = (status) => {
 
 const convertBmStatus = (status) => {
 	switch (status) {
-		case "0":
+		case 0:
 			return "Bị giới hạn";
-		case "1":
+		case 1:
 			return "Đang hoạt động";
 		default:
 			return "Chưa kiểm tra";
@@ -281,21 +281,26 @@ export default function BMList() {
 		setLoading(true);
 		owners = owners.map((owner) => owner.id);
 		let response = await BmsServices.checkBM(bmid, owners);
+		console.log(response);
 		if (response.success) {
-			if (response.status == "created" || response.status == "updated") {
-				enqueueSnackbar(response.messages, {
+			if (response.status == 1) {
+				enqueueSnackbar(response.message, {
 					variant: "success",
 				});
 				let newListBms = [...listBMs];
-				newListBms[rowIndex].status = response.data.status;
+				newListBms[rowIndex].status = response.status;
 				setListBMs(newListBms);
-			} else if (response.status == "failed") {
-				enqueueSnackbar(response.messages, {
+			} else {
+				enqueueSnackbar(response.message, {
 					variant: "warning",
 				});
+				let newListBms = [...listBMs];
+				console.log(newListBms[rowIndex]);
+				newListBms[rowIndex].status = response.status;
+				setListBMs(newListBms);
 			}
 		} else {
-			enqueueSnackbar(response.messages, {
+			enqueueSnackbar(response.message, {
 				variant: "error",
 			});
 		}

@@ -30,7 +30,11 @@ export default {
 			return viaStatus.data;
 		} catch (err) {
 			console.log(err);
-			return { success: false, messages: "Đã xảy ra lỗi không xác định" };
+			return {
+				success: false,
+				messages: "Đã xảy ra lỗi không xác định",
+				errors: err,
+			};
 		}
 	},
 };
