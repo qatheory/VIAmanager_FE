@@ -21,18 +21,36 @@ export default {
 	checkBM: async (bmid, owners) => {
 		let header = Commons.header();
 		try {
-			let viaStatus = await axios({
+			let bmStatus = await axios({
 				url: `${Constants.API_DOMAIN}/api/bm-check/`,
 				method: "POST",
 				headers: header,
 				data: { bmid, viaFbId: owners.join(",") },
 			});
-			return viaStatus.data;
+			return bmStatus.data;
 		} catch (err) {
 			console.log(err);
 			return {
 				success: false,
 				messages: "Đã xảy ra lỗi không xác định",
+				errors: err,
+			};
+		}
+	},
+	checkAllBm: async () => {
+		let header = Commons.header();
+		try {
+			let bmStatus = await axios({
+				url: `${Constants.API_DOMAIN}/api/bm-check-all/`,
+				method: "POST",
+				headers: header,
+			});
+			return bmStatus.data;
+		} catch (err) {
+			console.log(err);
+			return {
+				success: false,
+				message: "Đã xảy ra lỗi không xác định",
 				errors: err,
 			};
 		}

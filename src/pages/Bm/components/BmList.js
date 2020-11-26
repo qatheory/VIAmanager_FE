@@ -225,11 +225,15 @@ export default function BMList() {
 	};
 	const getBmList = () => {
 		setLoading(true);
+		let selectedBmStatus = "";
+		if (selectedStatus !== 2) {
+			selectedBmStatus = selectedStatus;
+		}
 		axios({
 			url: `${Constants.API_DOMAIN}/api/bms/`,
 			method: "GET",
 			headers: header,
-			params: { via: selectedVia, status: selectedStatus },
+			params: { via: selectedVia, status: selectedBmStatus },
 		})
 			.then((resp) => {
 				setListBMs(resp.data.data);
@@ -281,7 +285,6 @@ export default function BMList() {
 		setLoading(true);
 		owners = owners.map((owner) => owner.id);
 		let response = await BmsServices.checkBM(bmid, owners);
-		console.log(response);
 		if (response.success) {
 			if (response.status == 1) {
 				enqueueSnackbar(response.message, {

@@ -11,7 +11,8 @@ export const bmSlice = createSlice({
 		bmOwnersName: "",
 		isLoadingBm: false,
 		selectedVia: "",
-		bmStatus: 0,
+		bmVerificationStatus: 0,
+		bmStatus: 2,
 		AdsAccOwnedId: "",
 		AdsAccOwnedName: "",
 		AdsAccOwnedVia: "",
@@ -35,6 +36,9 @@ export const bmSlice = createSlice({
 		},
 		setSelectedVia: (state, action) => {
 			state.selectedVia = action.payload;
+		},
+		setBmVerificationStatus: (state, action) => {
+			state.bmVerificationStatus = action.payload;
 		},
 		setBmStatus: (state, action) => {
 			state.bmStatus = action.payload;
@@ -79,6 +83,7 @@ export const {
 	setBmDetailID,
 	setLoadBmStatus,
 	setSelectedVia,
+	setBmVerificationStatus,
 	setBmStatus,
 	setBmOwnersId,
 	setBmOwnersName,
