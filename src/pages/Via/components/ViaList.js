@@ -72,7 +72,7 @@ const columns = [
 	{
 		id: "options",
 		label: "Tùy chọn",
-		minWidth: 170,
+		minWidth: 200,
 		align: "right",
 	},
 ];

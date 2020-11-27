@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
-import { red, amber } from "@material-ui/core/colors";
+import { red, amber, green, blue } from "@material-ui/core/colors";
 import * as moment from "moment";
 import Commons from "_helpers/commons.js";
 import {
@@ -31,7 +31,6 @@ import {
 	setAdsAccOwnedVia,
 } from "store/reducers/bm";
 import { useSnackbar } from "notistack";
-import blue from "@material-ui/core/colors/blue";
 import LocalActivityIcon from "@material-ui/icons/LocalActivity";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
@@ -109,7 +108,7 @@ const columns = [
 	{
 		id: "options",
 		label: "Tùy chọn",
-		minWidth: 170,
+		minWidth: 200,
 		align: "right",
 	},
 ];
@@ -151,6 +150,12 @@ const useStyles = makeStyles({
 	},
 	progressLoading: {
 		backgroundColor: "rgba(0,0,0,0.05)",
+	},
+	textDanger: {
+		color: red[700],
+	},
+	textSuccess: {
+		color: green[700],
 	},
 });
 
@@ -225,18 +230,16 @@ export default function BMList() {
 	};
 	const getBmList = () => {
 		setLoading(true);
-		let selectedBmStatus = "";
-		if (selectedStatus !== 2) {
-			selectedBmStatus = selectedStatus;
-		}
 		axios({
 			url: `${Constants.API_DOMAIN}/api/bms/`,
 			method: "GET",
 			headers: header,
-			params: { via: selectedVia, status: selectedBmStatus },
+			params: { via: selectedVia, status: selectedStatus },
 		})
 			.then((resp) => {
+				console.log(resp.data.data);
 				setListBMs(resp.data.data);
+
 				if (resp.data.error.viaError.length != 0) {
 					enqueueSnackbar(
 						`Xảy ra lỗi với Via: ${resp.data.error.viaError.join(
@@ -447,7 +450,8 @@ export default function BMList() {
 								page * rowsPerPage + rowsPerPage
 							)
 							.map((row, rowIndex) => {
-								const isItemSelected = isSelected(row.id);
+								const isItemSelected =
+									row == null ? false : isSelected(row.id);
 								return (
 									<TableRow
 										// className={clsx({
@@ -476,6 +480,22 @@ export default function BMList() {
 										</TableCell>
 										{columns.map((column, colIndex) => {
 											const value = row[column.id];
+											if (column.id == "status") {
+												return (
+													<TableCell
+														key={column.id}
+														align={column.align}
+														className={clsx({
+															[classes.textDanger]:
+																value === 0,
+															[classes.textSuccess]:
+																value === 1,
+														})}
+													>
+														{column.format(value)}
+													</TableCell>
+												);
+											}
 											if (column.id == "backup_link") {
 												return (
 													<TableCell

@@ -12,7 +12,9 @@ import {
 	Select,
 	MenuItem,
 	Input,
+	CircularProgress,
 } from "@material-ui/core";
+import blue from "@material-ui/core/colors/blue";
 import { useSnackbar } from "notistack";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import RefreshIcon from "@material-ui/icons/Refresh";
@@ -64,6 +66,18 @@ const useStyles = makeStyles((theme) => ({
 			minWidth: 160,
 		},
 	},
+	wrapper: {
+		margin: theme.spacing(1, 0),
+		position: "relative",
+	},
+	buttonProgress: {
+		color: blue[500],
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -12,
+		marginLeft: -12,
+	},
 }));
 function BmHeader(props) {
 	const classes = useStyles();
@@ -73,6 +87,7 @@ function BmHeader(props) {
 		(state) => state.bm.bmVerificationStatus
 	);
 	let selectedStatus = useSelector((state) => state.bm.bmStatus);
+	const [isCheckingBm, setIsCheckingBm] = React.useState(false);
 	const [listVias, setListVias] = React.useState([]);
 	const dispatch = useDispatch();
 	React.useEffect(() => {
@@ -97,10 +112,10 @@ function BmHeader(props) {
 		dispatch(setSelectedVia(event.target.value));
 		dispatch(setLoadBmStatus(true));
 	};
-	const handleChangeVerficationStatus = (event) => {
-		dispatch(setBmVerificationStatus(event.target.value));
-		dispatch(setLoadBmStatus(true));
-	};
+	// const handleChangeVerficationStatus = (event) => {
+	// 	dispatch(setBmVerificationStatus(event.target.value));
+	// 	dispatch(setLoadBmStatus(true));
+	// };
 	const handleChangeStatus = (event) => {
 		dispatch(setBmStatus(event.target.value));
 		dispatch(setLoadBmStatus(true));
@@ -109,6 +124,7 @@ function BmHeader(props) {
 		dispatch(setLoadBmStatus(true));
 	};
 	const handleCheckAllBm = async () => {
+		setIsCheckingBm(true);
 		enqueueSnackbar("Xin hãy đợi trong giây lát");
 		let response = await BmsServices.checkAllBm();
 		if (response.success) {
@@ -126,6 +142,7 @@ function BmHeader(props) {
 				variant: "error",
 			});
 		}
+		setIsCheckingBm(false);
 	};
 	const handleExport = () => {
 		dispatch(setDownloadStatus(true));
@@ -224,48 +241,65 @@ function BmHeader(props) {
 								<MenuItem key={2} value={2}>
 									Chưa kiểm tra
 								</MenuItem>
+
+								<MenuItem key={3} value={3}>
+									Mọi trạng thái
+								</MenuItem>
 							</Select>
 						</FormControl>
 					</div>
 				</Grid>
 			</Grid>
 			<Grid container justify="flex-end" item md={12}>
-				<Button
-					variant="outlined"
-					color="primary"
-					className={clsx(
-						classes.card__header__item,
-						classes.floatRight
+				<div className={classes.wrapper}>
+					<Button
+						variant="outlined"
+						color="primary"
+						className={clsx(
+							classes.card__header__item,
+							classes.floatRight
+						)}
+						endIcon={<RefreshIcon></RefreshIcon>}
+						onClick={handleRefresh}
+					>
+						Làm mới
+					</Button>
+				</div>
+				<div className={classes.wrapper}>
+					<Button
+						variant="outlined"
+						color="primary"
+						className={clsx(
+							classes.card__header__item
+							// classes.floatRight
+						)}
+						endIcon={<GetAppIcon></GetAppIcon>}
+						onClick={handleCheckAllBm}
+						disabled={isCheckingBm}
+					>
+						Kiểm tra BM
+					</Button>
+					{isCheckingBm && (
+						<CircularProgress
+							size={24}
+							className={classes.buttonProgress}
+						/>
 					)}
-					endIcon={<RefreshIcon></RefreshIcon>}
-					onClick={handleRefresh}
-				>
-					Làm mới
-				</Button>
-				<Button
-					variant="outlined"
-					color="primary"
-					className={clsx(
-						classes.card__header__item
-						// classes.floatRight
-					)}
-					endIcon={<GetAppIcon></GetAppIcon>}
-					onClick={handleCheckAllBm}
-				>
-					Kiểm tra BM
-				</Button>
-				<Button
-					variant="outlined"
-					color="primary"
-					className={clsx(
-						classes.card__header__item
-						// classes.floatRight
-					)}
-					endIcon={<GetAppIcon></GetAppIcon>}
-					onClick={handleExport}
-				>
-					Tải xuống
-				</Button>
+				</div>
+				<div className={classes.wrapper}>
+					<Button
+						variant="outlined"
+						color="primary"
+						className={clsx(
+							classes.card__header__item
+							// classes.floatRight
+						)}
+						endIcon={<GetAppIcon></GetAppIcon>}
+						onClick={handleExport}
+					>
+						Tải xuống
+					</Button>
+				</div>
 			</Grid>
 		</Grid>
 	);

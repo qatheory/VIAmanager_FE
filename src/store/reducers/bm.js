@@ -12,7 +12,7 @@ export const bmSlice = createSlice({
 		isLoadingBm: false,
 		selectedVia: "",
 		bmVerificationStatus: 0,
-		bmStatus: 2,
+		bmStatus: 3,
 		AdsAccOwnedId: "",
 		AdsAccOwnedName: "",
 		AdsAccOwnedVia: "",

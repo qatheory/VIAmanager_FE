@@ -9,7 +9,7 @@ export default {
 
 		try {
 			let viaStatus = await axios({
-				url: `${Constants.API_DOMAIN}/api/check-via/${id}/`,
+				url: `${Constants.API_DOMAIN}/api/via-check/${id}/`,
 				method: "GET",
 				headers: header,
 			});
@@ -44,6 +44,24 @@ export default {
 				message: "Đã có lỗi xảy ra!!!",
 				status: "error",
 				error: err,
+			};
+		}
+	},
+	checkAllVias: async () => {
+		let header = Commons.header();
+		try {
+			let viasStatus = await axios({
+				url: `${Constants.API_DOMAIN}/api/via-check-all/`,
+				method: "POST",
+				headers: header,
+			});
+			return viasStatus.data;
+		} catch (err) {
+			console.log(err);
+			return {
+				success: false,
+				message: "Đã xảy ra lỗi không xác định",
+				errors: err,
 			};
 		}
 	},

@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles, fade } from "@material-ui/core/styles";
+import { blue } from "@material-ui/core/colors";
 import {
 	Button,
 	InputBase,
@@ -11,13 +12,17 @@ import {
 	DialogTitle,
 	DialogActions,
 	TextField,
+	CircularProgress,
 } from "@material-ui/core";
+import { useSnackbar } from "notistack";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import SearchIcon from "@material-ui/icons/Search";
 import ListAltIcon from "@material-ui/icons/ListAlt";
+import HelpIcon from "@material-ui/icons/Help";
 import { Link } from "react-router-dom";
 import { setLoadViasStatus, setSearchParams } from "store/reducers/via";
+import ViasServices from "_services/vias.js";
 
 const useStyles = makeStyles((theme) => ({
 	card__header__item: {
@@ -81,9 +86,24 @@ const useStyles = makeStyles((theme) => ({
 		alignItems: "center",
 		justifyContent: "center",
 	},
+	wrapper: {
+		margin: theme.spacing(0),
+		position: "relative",
+	},
+	buttonProgress: {
+		color: blue[500],
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -12,
+		marginLeft: -12,
+	},
 }));
 function ViaHeader({ props }) {
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	const [advancedSearch, setAdvancedSearch] = React.useState(false);
+	const [isCheckingVia, setIsCheckingVia] = React.useState(false);
+
 	const [searchParamsForm, setSearchParamsForm] = React.useState({
 		params: {
 			name: "",
@@ -144,10 +164,32 @@ function ViaHeader({ props }) {
 	const handleAddVia = () => {
 		props.history.push("/admin/manage-via/create");
 	};
+	const handleCheckAllVias = async () => {
+		setIsCheckingVia(true);
+		enqueueSnackbar("Xin hãy đợi trong giây lát");
+		let response = await ViasServices.checkAllVias();
+		if (response.success) {
+			if (response.status === true) {
+				enqueueSnackbar(response.message, {
+					variant: "success",
+				});
+			} else {
+				enqueueSnackbar(response.message, {
+					variant: "warning",
+				});
+			}
+		} else {
+			enqueueSnackbar(response.message, {
+				variant: "error",
+			});
+		}
+		setIsCheckingVia(false);
+	};
+
 	return (
 		<React.Fragment>
 			<Grid container spacing={0}>
-				<Grid container justify="flex-start" item xs={12} md={8}>
+				<Grid container justify="flex-start" item xs={12} md={12}>
 					<div
 						className={clsx(
 							classes.card__header__item,
@@ -175,42 +217,69 @@ function ViaHeader({ props }) {
 							/>
 						</div>
 					</div>
+
 					<Button
 						variant="outlined"
 						color="primary"
 						className={clsx(
-							classes.card__header__item,
-							classes.auto_float_right
+							classes.card__header__item
+							// classes.auto_float_right
 						)}
 						endIcon={<ListAltIcon></ListAltIcon>}
 						onClick={handleOpenAdvancedSearch}
 					>
 						Tìm kiếm nâng cao
 					</Button>
-				</Grid>
-				<Grid container justify="flex-end" item md={4}>
-					<Button
-						variant="outlined"
-						color="primary"
-						className={clsx(
-							classes.card__header__item,
-							classes.floatRight
+					<div className={classes.wrapper}>
+						<Button
+							variant="outlined"
+							color="primary"
+							className={clsx(
+								classes.card__header__item
+								// classes.floatRight
+							)}
+							endIcon={<HelpIcon></HelpIcon>}
+							onClick={handleCheckAllVias}
+							disabled={isCheckingVia}
+						>
+							Kiểm tra Vias
+						</Button>
+						{isCheckingVia && (
+							<CircularProgress
+								size={24}
+								className={classes.buttonProgress}
+							/>
 						)}
-						endIcon={<RefreshIcon></RefreshIcon>}
-						onClick={handleRefresh}
-					>
-						Làm mới
-					</Button>
-					<Button
-						variant="outlined"
-						color="primary"
-						className={clsx(classes.card__header__item)}
-						endIcon={<PersonAddIcon></PersonAddIcon>}
-						onClick={handleAddVia}
-					>
-						Thêm
-					</Button>
+					</div>
+					<div className={classes.wrapper}>
+						<Button
+							variant="outlined"
+							color="primary"
+							className={clsx(
+								classes.card__header__item
+								// classes.floatRight
+							)}
+							endIcon={<RefreshIcon></RefreshIcon>}
+							onClick={handleRefresh}
+						>
+							Làm mới
+						</Button>
+					</div>
+					<div className={classes.wrapper}>
+						<Button
+							variant="outlined"
+							color="primary"
+							className={clsx(classes.card__header__item)}
+							endIcon={<PersonAddIcon></PersonAddIcon>}
+							onClick={handleAddVia}
+						>
+							Thêm
+						</Button>
+					</div>
 				</Grid>
+				{/* <Grid container justify="flex-end" item md={4}>
+					
+				</Grid> */}
 			</Grid>
 			<Dialog
 				open={advancedSearch}
