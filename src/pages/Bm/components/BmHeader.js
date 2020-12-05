@@ -19,6 +19,8 @@ import { useSnackbar } from "notistack";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import AutorenewIcon from "@material-ui/icons/Autorenew";
+import SaveIcon from "@material-ui/icons/Save";
 import SearchIcon from "@material-ui/icons/Search";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import { Link } from "react-router-dom";
@@ -88,6 +90,7 @@ function BmHeader(props) {
 	);
 	let selectedStatus = useSelector((state) => state.bm.bmStatus);
 	const [isCheckingBm, setIsCheckingBm] = React.useState(false);
+	const [isBackupBm, setIsBackupBm] = React.useState(false);
 	const [listVias, setListVias] = React.useState([]);
 	const dispatch = useDispatch();
 	React.useEffect(() => {
@@ -143,6 +146,27 @@ function BmHeader(props) {
 			});
 		}
 		setIsCheckingBm(false);
+	};
+	const handleBackupAllBm = async () => {
+		setIsBackupBm(true);
+		enqueueSnackbar("Xin hãy đợi trong giây lát");
+		let response = await BmsServices.backupAllBm();
+		if (response.success) {
+			if (response.status === true) {
+				enqueueSnackbar(response.message, {
+					variant: "success",
+				});
+			} else {
+				enqueueSnackbar(response.message, {
+					variant: "warning",
+				});
+			}
+		} else {
+			enqueueSnackbar(response.message, {
+				variant: "error",
+			});
+		}
+		setIsBackupBm(false);
 	};
 	const handleExport = () => {
 		dispatch(setDownloadStatus(true));
@@ -273,7 +297,28 @@ function BmHeader(props) {
 							classes.card__header__item
 							// classes.floatRight
 						)}
-						endIcon={<GetAppIcon></GetAppIcon>}
+						endIcon={<SaveIcon />}
+						onClick={handleBackupAllBm}
+						disabled={isBackupBm}
+					>
+						Backup BM
+					</Button>
+					{isBackupBm && (
+						<CircularProgress
+							size={24}
+							className={classes.buttonProgress}
+						/>
+					)}
+				</div>
+				<div className={classes.wrapper}>
+					<Button
+						variant="outlined"
+						color="primary"
+						className={clsx(
+							classes.card__header__item
+							// classes.floatRight
+						)}
+						endIcon={<AutorenewIcon></AutorenewIcon>}
 						onClick={handleCheckAllBm}
 						disabled={isCheckingBm}
 					>

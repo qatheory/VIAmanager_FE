@@ -55,4 +55,22 @@ export default {
 			};
 		}
 	},
+	backupAllBm: async () => {
+		let header = Commons.header();
+		try {
+			let bmStatus = await axios({
+				url: `${Constants.API_DOMAIN}/api/bm-backup-all/`,
+				method: "POST",
+				headers: header,
+			});
+			return bmStatus.data;
+		} catch (err) {
+			console.log(err);
+			return {
+				success: false,
+				message: "Đã xảy ra lỗi không xác định",
+				errors: err,
+			};
+		}
+	},
 };
